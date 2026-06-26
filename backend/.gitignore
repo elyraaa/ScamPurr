@@ -1,0 +1,14 @@
+# Backend gitignore
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+*.db
+*.sqlite3
+model/scam_classifier.pkl
+.pytest_cache/
+dist/
+build/
+*.egg-info/
+firebase-credentials.json

@@ -1,0 +1,1 @@
+# ScamPurr AI - Schemas Package

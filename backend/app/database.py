@@ -12,9 +12,15 @@ engine = create_engine(
     settings.DATABASE_URL,
     connect_args=connect_args,
     echo=settings.DEBUG,
+    pool_pre_ping=True,
+    pool_recycle=300,
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+)
 
 
 class Base(DeclarativeBase):
@@ -32,6 +38,6 @@ def get_db():
 
 def create_all_tables():
     """Create all tables from ORM models. Called at startup."""
-    # Import all models so Base registers them
     from app.models import user, analysis, risk_score  # noqa: F401
+
     Base.metadata.create_all(bind=engine)

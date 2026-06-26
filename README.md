@@ -52,7 +52,7 @@ ScamPurr AI analyzes suspicious cat adoption listings and shelter websites, then
 ### 1. Open the project
 
 ```powershell
-cd "C:\Users\Vincent Santos\.gemini\antigravity-ide\scratch\scampurr-ai"
+cd "C:\Users\...."
 ```
 
 If you cloned the project somewhere else, run the same command from your own `scampurr-ai` folder.
@@ -65,9 +65,7 @@ If you cloned the project somewhere else, run the same command from your own `sc
 
 This single command starts both local servers:
 
-- Backend API: http://localhost:8000
-- Backend API docs: http://localhost:8000/docs
-- Frontend app: http://localhost:5173
+http://localhost:5173
 
 Press `Ctrl+C` in the terminal to stop both servers.
 

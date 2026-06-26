@@ -1,105 +1,117 @@
 """
 Train the ScamPurr AI listing scam classifier.
-Generates: model/scam_classifier.pkl (TF-IDF vectorizer + Random Forest)
 
-Usage:
-    cd backend
+Default:
     python scripts/train_model.py
+
+With a custom labeled CSV:
+    python scripts/train_model.py --data data/training_examples.csv
+
+CSV columns:
+    text,label
+    "Free kitten, pay shipping by gift card",1
+    "Licensed shelter, meet in person, vet records included",0
 """
+from __future__ import annotations
+
+import argparse
 import os
 import sys
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import joblib
-import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
 
-# ── Synthetic Training Data ────────────────────────────────────────────────────
+
+DEFAULT_DATA_PATH = Path("data/training_examples.csv")
+DEFAULT_MODEL_PATH = Path("model/scam_classifier.pkl")
+
 
 SCAM_LISTINGS = [
-    "Beautiful Persian kittens available for free! Due to my recent deployment overseas, I need to find them good homes quickly. You will only need to pay the shipping fee of $150 via Western Union.",
-    "Adorable Ragdoll kittens, free to good home. Contact me at mypets@gmail.com. I cannot meet in person but can arrange nationwide delivery. God bless you.",
-    "Scottish Fold kittens for rehoming! Act now, limited time! Pay a small transport fee of $200 gift card. Last chance before they go to the shelter.",
-    "Free Maine Coon kitten due to circumstances. Pastor needs urgent home. Send wire transfer deposit first, then we'll ship overnight.",
-    "Pure breed Siamese, free adoption. Owner is terminally ill and cannot care for them. Wire transfer only, no meetups available.",
-    "BENGAL KITTENS FREE! First come first served! Must pay delivery fee via Zelle to confirm. Once payment received, we will ship.",
-    "Healthy kittens available. I'm a missionary in Africa and cannot bring them with me. Please send money order for shipping.",
-    "Purebred Persian, free to approved home. No questions asked, can be shipped anywhere. Payment via Bitcoin for security.",
-    "Exotic shorthair kittens FREE! My family is going through divorce so I need to rehome quickly. Pay insurance fee to ship.",
-    "Beautiful Bengal kittens for adoption. Send $300 via gift card for vaccination fee before meeting. Act now!",
-    "Maine Coon kittens going fast! Can't meet, will ship. Western Union payment only. God bless!",
-    "Free ragdoll for good home. Military deployment, must go ASAP. Shipping fee via money gram required.",
-    "Purebred Siamese kittens, no papers needed. Pay $200 customs fee to release from quarantine.",
-    "Adorable kittens need urgent home. Owner passed away. Contact me for shipping, pay upfront via cash app.",
-    "FREE Scottish fold! One day only! Send $150 Zelle for transport fee. Won't last!",
-    "Bengal kittens free to caring owner. I cannot meet but will ship with courier. Pay insurance fee first.",
-    "Gorgeous Persian kittens. Due to moving abroad, giving away free but need shipping fee. WhatsApp me.",
-    "Rare kittens available free. Pay only delivery charges via Western Union. Act now, limited offer.",
-    "Beautiful kittens free to good home. No meetup, delivery only nationwide. Transfer fee required.",
-    "Adorable Ragdoll. Owner in hospital, needs urgent rehoming. Wire $250 for transport and insurance.",
+    "Beautiful Persian kittens available for free. Pay the shipping fee via Western Union before delivery.",
+    "Ragdoll kittens free to good home. I cannot meet in person but can arrange nationwide delivery.",
+    "Scottish Fold kittens. Pay a small transport fee by gift card. Last chance before they go to shelter.",
+    "Free Maine Coon kitten due to deployment. Send wire transfer deposit first, then we ship overnight.",
+    "Pure breed Siamese, free adoption. Wire transfer only, no meetups available.",
+    "Bengal kittens free. Must pay delivery fee via Zelle to confirm.",
+    "Healthy kittens available. Send money order for shipping.",
+    "Purebred Persian free to approved home. Payment via Bitcoin for transport.",
+    "Exotic shorthair kittens. Pay insurance fee to ship.",
+    "Maine Coon kittens going fast. Can't meet, will ship. Western Union payment only.",
 ]
+
 
 LEGITIMATE_LISTINGS = [
-    "Friendly adult tabby cat available for adoption from our registered shelter. Fully vaccinated, spayed, and microchipped. Adoption application required. Come meet her at our facility on weekends.",
-    "Two bonded brothers, 3 years old, looking for their forever home. Both neutered and up to date on vaccinations. Local pickup only. Please fill out our adoption form.",
-    "Our non-profit rescue has 5 kittens ready for adoption. All kittens have been vet checked, vaccinated, and dewormed. Home visit required. Adoption fee: $75 covers vet costs.",
-    "Mixed breed cat seeking loving home. Licensed rescue, adoption process includes application and interview. Health certificate provided. In-person meeting required.",
-    "Rescue tabby, 2 years old, loves cuddles. Come visit us at the shelter. Fully vaccinated and microchipped. $50 adoption fee to cover spay and vaccinations.",
-    "3-year-old domestic shorthair looking for his forever family. ASPCA member rescue. Adoption application, home visit, and in-person interview required. All vet records provided.",
-    "We have 8 kittens available through our accredited rescue organization. All have received health certificates and are ready for their forever homes. Adoption fee applies.",
-    "Beautiful tortoiseshell, neutered and microchipped. Please visit our shelter or check petfinder.com for our adoption application. Health guarantee included.",
-    "Senior cats need loving homes! Our registered 501c3 rescue places cats with families. Adoption process includes application, reference check, and in-person meeting.",
-    "Friendly ginger tabby needs a home. We are a licensed shelter. Vaccination records, vet history, and microchip included in adoption. Come meet him any Saturday.",
-    "Two sisters looking for home together. Both spayed, vaccinated, microchipped. Local pickup in Seattle. Full vet records included. Adoption fee $150 for the pair.",
-    "Young male, neutered, litter trained. Registered no-kill shelter. Full health exam, FIV/FeLV tested, all vaccines current. Adoption fee $80.",
-    "Playful kittens ready for adoption. All have first set of vaccines and deworming. Adoption application available on our website. Home checks conducted.",
-    "Rescue from hoarding situation, now healthy and ready for adoption. Fully vetted, vaccinated, microchipped. Licensed rescue organization.",
-    "Bonded pair of cats needing a home. Please visit our shelter website to submit application. Home visit required. All vet records included.",
-    "Friendly adult cat, 4 years old. Spayed, vaccinated, microchipped. Adoption fee $60. Must meet at our facility. References required.",
-    "Orange tabby kitten, 12 weeks. Vet checked, first vaccines done. Local adoptions only — come visit us at our Brookside location.",
-    "Maine Coon mix needing home. Registered rescue with accreditation. Detailed health history provided. Adoption process and home check required.",
-    "Older cat available for adoption. Our non-profit organization works with certified vets. Home visit, adoption application, and reference check required.",
-    "Beautiful black cat, very affectionate. 501c3 rescue with established track record. Full vet records, microchip, all vaccines. In-person adoption only.",
+    "Friendly adult tabby available from a registered shelter. Vaccinated, spayed, and microchipped.",
+    "Two bonded brothers looking for a home. Local pickup only. Adoption form required.",
+    "Non-profit rescue has kittens ready for adoption. Vet checked, vaccinated, and dewormed.",
+    "Licensed rescue, adoption process includes application and interview. Health certificate provided.",
+    "Rescue tabby loves cuddles. Come visit us at the shelter. Adoption fee covers vet costs.",
+    "Domestic shorthair looking for family. Adoption application and in-person interview required.",
+    "Accredited rescue organization with health certificates. Adoption fee applies.",
+    "Tortoiseshell cat, neutered and microchipped. Visit our shelter for adoption application.",
+    "Registered rescue places cats with families after reference checks and home visit.",
+    "Licensed shelter. Vaccination records, vet history, and microchip included in adoption.",
 ]
 
-# ── Build Dataset ──────────────────────────────────────────────────────────────
 
-def build_dataset():
-    texts = SCAM_LISTINGS + LEGITIMATE_LISTINGS
-    labels = [1] * len(SCAM_LISTINGS) + [0] * len(LEGITIMATE_LISTINGS)
-
-    # Augment with variations
-    augmented_texts = []
-    augmented_labels = []
-    for text, label in zip(texts, labels):
-        augmented_texts.append(text)
-        augmented_labels.append(label)
-        # Simple augmentation: lowercase version
-        augmented_texts.append(text.lower())
-        augmented_labels.append(label)
-        # Truncated version
-        augmented_texts.append(text[:len(text)//2])
-        augmented_labels.append(label)
-
-    return augmented_texts, augmented_labels
+def synthetic_dataset() -> pd.DataFrame:
+    rows = []
+    for text in SCAM_LISTINGS:
+        rows.append({"text": text, "label": 1})
+        rows.append({"text": text.lower(), "label": 1})
+    for text in LEGITIMATE_LISTINGS:
+        rows.append({"text": text, "label": 0})
+        rows.append({"text": text.lower(), "label": 0})
+    return pd.DataFrame(rows)
 
 
-def train():
+def load_dataset(path: Path) -> pd.DataFrame:
+    if not path.exists():
+        print(f"No CSV found at {path}; using built-in demo training data.")
+        return synthetic_dataset()
+
+    data = pd.read_csv(path)
+    required_columns = {"text", "label"}
+    missing = required_columns - set(data.columns)
+    if missing:
+        raise ValueError(f"Training CSV is missing columns: {', '.join(sorted(missing))}")
+
+    data = data[["text", "label"]].dropna()
+    data["text"] = data["text"].astype(str).str.strip()
+    data["label"] = data["label"].astype(int)
+    data = data[data["text"] != ""]
+
+    invalid_labels = sorted(set(data["label"]) - {0, 1})
+    if invalid_labels:
+        raise ValueError(f"Labels must be 0 or 1. Invalid labels: {invalid_labels}")
+
+    if data["label"].nunique() < 2:
+        raise ValueError("Training data must include both classes: 0=legitimate and 1=scam.")
+
+    return data
+
+
+def train(data_path: Path, model_path: Path) -> None:
     print("Building training dataset...")
-    texts, labels = build_dataset()
+    data = load_dataset(data_path)
 
     X_train, X_test, y_train, y_test = train_test_split(
-        texts, labels, test_size=0.2, random_state=42, stratify=labels
+        data["text"],
+        data["label"],
+        test_size=0.2,
+        random_state=42,
+        stratify=data["label"],
     )
 
-    print(f"Training samples: {len(X_train)}, Test samples: {len(X_test)}")
+    print(f"Training samples: {len(X_train)}, test samples: {len(X_test)}")
 
-    # TF-IDF Vectorizer
     vectorizer = TfidfVectorizer(
         ngram_range=(1, 2),
         max_features=5000,
@@ -109,30 +121,37 @@ def train():
     X_train_vec = vectorizer.fit_transform(X_train)
     X_test_vec = vectorizer.transform(X_test)
 
-    # Random Forest Classifier
-    clf = RandomForestClassifier(
+    classifier = RandomForestClassifier(
         n_estimators=200,
         max_depth=10,
         random_state=42,
         class_weight="balanced",
     )
-    clf.fit(X_train_vec, y_train)
+    classifier.fit(X_train_vec, y_train)
 
-    # Evaluate
-    y_pred = clf.predict(X_test_vec)
+    y_pred = classifier.predict(X_test_vec)
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred, target_names=["Legitimate", "Scam"]))
 
-    # Save model
-    os.makedirs("model", exist_ok=True)
-    model_path = "model/scam_classifier.pkl"
-    joblib.dump({
-        "vectorizer": vectorizer,
-        "classifier": clf,
-        "feature_names": vectorizer.get_feature_names_out().tolist(),
-    }, model_path)
+    model_path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(
+        {
+            "vectorizer": vectorizer,
+            "classifier": classifier,
+            "feature_names": vectorizer.get_feature_names_out().tolist(),
+        },
+        model_path,
+    )
     print(f"\nModel saved to {model_path}")
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Train the ScamPurr AI listing classifier.")
+    parser.add_argument("--data", type=Path, default=DEFAULT_DATA_PATH, help="CSV with text,label columns.")
+    parser.add_argument("--out", type=Path, default=DEFAULT_MODEL_PATH, help="Output model path.")
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    train()
+    args = parse_args()
+    train(args.data, args.out)

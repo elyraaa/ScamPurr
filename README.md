@@ -45,51 +45,51 @@ ScamPurr AI analyzes suspicious cat adoption listings and shelter websites, then
 
 ### Prerequisites
 
-- Python 3.12+ (check with `py --version` on Windows)
-- Node.js 18+ (check with `node --version`)
+- Python 3.11 or 3.12
+- Node.js 18+
 - Git
 
 ### 1. Open the project
 
 ```powershell
-cd "C:\Users\...."
+cd "C:\Users\Vincent Santos\.gemini\antigravity-ide\scratch\scampurr-ai"
 ```
-
-If you cloned the project somewhere else, run the same command from your own `scampurr-ai` folder.
 
 ### 2. Run the app
 
 ```powershell
-.\backend\venv\Scripts\python.exe server.py
+.\backend\.venv\Scripts\python.exe server.py
 ```
 
 This single command starts both local servers:
 
-http://localhost:5173
+- Frontend app: http://localhost:5173
+- Backend API: http://localhost:8000
+- Backend API docs: http://localhost:8000/docs
 
 Press `Ctrl+C` in the terminal to stop both servers.
 
 ### First-time setup only
 
-The checked-in local scratch project already includes `backend\venv`, `frontend\node_modules`, and `.env` files. If you are setting up from a fresh clone, run these once before `.\backend\venv\Scripts\python.exe server.py`:
+If you are setting up from a fresh clone, run this once:
 
 ```powershell
 cd backend
-py -m venv venv
-.\venv\Scripts\python.exe -m pip install -r requirements.txt
+py -3.11 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 Copy-Item .env.example .env
-.\venv\Scripts\python.exe scripts\seed_demo.py
+.\.venv\Scripts\python.exe scripts\seed_demo.py
+.\.venv\Scripts\python.exe scripts\train_model.py
 
 cd ..\frontend
 npm install
 Copy-Item .env.example .env
 
 cd ..
-.\backend\venv\Scripts\python.exe server.py
+.\backend\.venv\Scripts\python.exe server.py
 ```
 
----
-## Demo Flow
+---## Demo Flow
 
 1. Open http://localhost:5173
 2. Click **Try Demo Mode** on the login page (no Firebase setup needed)
@@ -177,41 +177,97 @@ Full interactive docs: http://localhost:8000/docs
 
 ### Real ML Model (Random Forest)
 
-```bash
-cd backend
-venv\Scripts\activate
-python scripts/train_model.py  # Generates model/scam_classifier.pkl
+The project now supports CSV-based model training. Edit this file with more examples:
+
+```text
+backend/data/training_examples.csv
 ```
 
-Then set `USE_MOCK_ML=false` in `.env`.
+Required columns:
+
+```csv
+text,label
+"Free kitten, pay shipping by gift card",1
+"Licensed shelter, meet in person, vet records included",0
+```
+
+Train or retrain the model:
+
+```powershell
+cd backend
+.\.venv\Scripts\python.exe scripts\train_model.py
+```
+
+The trained model is saved to:
+
+```text
+backend/model/scam_classifier.pkl
+```
+
+Use real ML mode in `backend/.env`:
+
+```env
+USE_MOCK_ML=false
+MODEL_PATH=model/scam_classifier.pkl
+```
 
 ---
 
 ## Production Deployment
 
-### Backend → Render
+### Backend: Render
 
-1. Push to GitHub
-2. Create new Render Web Service
-3. Build: `pip install -r requirements.txt`
-4. Start: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-5. Set all env vars in Render dashboard
+This repo includes `render.yaml` for a Render web service. Render should use:
 
-### Frontend → Vercel
+```bash
+Build Command: pip install -r requirements.txt
+Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+Root Directory: backend
+```
 
-1. Import GitHub repo to Vercel
-2. Framework: Vite
-3. Build: `npm run build`
-4. Set `VITE_API_BASE_URL` to your Render backend URL
+Set these Render environment variables:
 
-### Database → Neon PostgreSQL
+```env
+USE_SQLITE=false
+DATABASE_URL=postgresql+psycopg2://USER:PASSWORD@HOST/DBNAME
+FIREBASE_MOCK_AUTH=true
+USE_MOCK_ML=false
+MODEL_PATH=model/scam_classifier.pkl
+USE_MOCK_URL=true
+DEBUG=false
+CORS_ORIGINS=["https://your-vercel-app.vercel.app"]
+```
 
-1. Create database at https://neon.tech
-2. Copy connection string
-3. Set in Render: `DATABASE_URL=postgresql+psycopg2://...` and `USE_SQLITE=false`
+### Frontend: Vercel
+
+Deploy the `frontend` folder as a Vite app. Use:
+
+```text
+Framework Preset: Vite
+Root Directory: frontend
+Build Command: npm run build
+Output Directory: dist
+```
+
+Set these Vercel environment variables:
+
+```env
+VITE_API_BASE_URL=https://your-render-backend.onrender.com
+VITE_DEMO_MODE=true
+VITE_DEMO_TOKEN=demo-user-1
+```
+
+### Database: Neon or Supabase Postgres
+
+For a deployed website, use Postgres instead of SQLite. Create a free Neon or Supabase database, copy the connection string, and set it as Render's `DATABASE_URL`.
+
+### Optional Real Services
+
+- Firebase Auth: set `FIREBASE_MOCK_AUTH=false` and `VITE_DEMO_MODE=false` after configuring Firebase.
+- Google Safe Browsing: set `GOOGLE_SAFE_BROWSING_API_KEY` and `USE_MOCK_URL=false`.
+- VirusTotal: set `VIRUSTOTAL_API_KEY`.
 
 ---
-
 ## Project Structure
 
 ```

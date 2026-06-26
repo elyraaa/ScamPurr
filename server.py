@@ -15,7 +15,13 @@ FRONTEND_PORT = os.environ.get("FRONTEND_PORT", "5173")
 
 def backend_python() -> Path:
     if os.name == "nt":
+        preferred = BACKEND_DIR / ".venv" / "Scripts" / "python.exe"
+        if preferred.exists():
+            return preferred
         return BACKEND_DIR / "venv" / "Scripts" / "python.exe"
+    preferred = BACKEND_DIR / ".venv" / "bin" / "python"
+    if preferred.exists():
+        return preferred
     return BACKEND_DIR / "venv" / "bin" / "python"
 
 

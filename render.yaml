@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: scampurr-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: USE_SQLITE
+        value: "false"
+      - key: FIREBASE_MOCK_AUTH
+        value: "true"
+      - key: USE_MOCK_ML
+        value: "false"
+      - key: MODEL_PATH
+        value: model/scam_classifier.pkl
+      - key: USE_MOCK_URL
+        value: "true"
+      - key: DEBUG
+        value: "false"
+      - key: CORS_ORIGINS
+        sync: false
+      - key: DATABASE_URL
+        sync: false

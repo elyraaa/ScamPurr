@@ -4,18 +4,14 @@ pydantic>=2.11
 pydantic-settings>=2.7
 sqlalchemy==2.0.36
 alembic
-# psycopg2-binary  # Uncomment for Postgres/Neon production; requires pg_config
+psycopg2-binary
 python-dotenv
 firebase-admin
-# ── ML packages (optional — only needed when USE_MOCK_ML=false) ───────────────
-# Requires Python 3.12 (pre-built wheels available). Python 3.14 is not yet supported.
-# With Python 3.12: pip install scikit-learn pandas numpy nltk joblib
-# scikit-learn==1.5.2
-# pandas==2.2.3
-# numpy==2.0.2
-# nltk==3.9.1
-# joblib==1.4.2
-# ─────────────────────────────────────────────────────────────────────────────
+scikit-learn==1.5.2
+pandas==2.2.3
+numpy==2.0.2
+nltk==3.9.1
+joblib==1.4.2
 httpx
 python-whois
 cryptography

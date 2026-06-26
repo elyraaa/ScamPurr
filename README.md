@@ -27,17 +27,19 @@ ScamPurr AI analyzes suspicious cat adoption listings and shelter websites, then
 
 ## Tech Stack
 
-**Frontend**: React 18 · TypeScript · TailwindCSS v4 · Framer Motion · React Hook Form · Zod · React Router · Axios
+**Frontend**: React 19, TypeScript 6, Vite 8, Tailwind CSS v4, Framer Motion, React Router, TanStack Query, React Hook Form, Zod, Axios, Lucide React
 
-**Backend**: FastAPI · Python 3.12+ · Pydantic v2 · SQLAlchemy · Uvicorn
+**Backend**: FastAPI, Python 3.11/3.12, Pydantic v2, Pydantic Settings, SQLAlchemy, Alembic, Uvicorn
 
-**AI/ML**: Scikit-Learn (Random Forest) · TF-IDF · NLTK · Pandas · NumPy
+**AI/ML**: Scikit-learn Random Forest, TF-IDF vectorization, pandas, NumPy, NLTK, joblib model serialization
 
-**Cybersecurity**: WHOIS · SSL validation · Google Safe Browsing API · VirusTotal API
+**Cybersecurity**: WHOIS checks, SSL certificate validation, HTTP metadata checks, optional Google Safe Browsing API, optional VirusTotal API
 
-**Auth**: Firebase Authentication (with demo bypass for local dev)
+**Auth**: Firebase Authentication with demo-mode bypass for local development and hackathon demos
 
-**Database**: SQLite (local) · PostgreSQL/Neon (production)
+**Database**: SQLite for local development, PostgreSQL for production using Neon or another hosted Postgres provider
+
+**Deployment**: Vercel for the frontend, Render for the FastAPI backend
 
 ---
 

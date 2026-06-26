@@ -49,62 +49,48 @@ ScamPurr AI analyzes suspicious cat adoption listings and shelter websites, then
 - Node.js 18+ (check with `node --version`)
 - Git
 
-### 1. Clone & setup
+### 1. Open the project
 
-```bash
-git clone <repo-url>
-cd scampurr-ai
+```powershell
+cd "C:\Users\Vincent Santos\.gemini\antigravity-ide\scratch\scampurr-ai"
 ```
 
-### 2. Backend setup
+If you cloned the project somewhere else, run the same command from your own `scampurr-ai` folder.
 
-```bash
+### 2. Run the app
+
+```powershell
+.\backend\venv\Scripts\python.exe server.py
+```
+
+This single command starts both local servers:
+
+- Backend API: http://localhost:8000
+- Backend API docs: http://localhost:8000/docs
+- Frontend app: http://localhost:5173
+
+Press `Ctrl+C` in the terminal to stop both servers.
+
+### First-time setup only
+
+The checked-in local scratch project already includes `backend\venv`, `frontend\node_modules`, and `.env` files. If you are setting up from a fresh clone, run these once before `.\backend\venv\Scripts\python.exe server.py`:
+
+```powershell
 cd backend
+py -m venv venv
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+Copy-Item .env.example .env
+.\venv\Scripts\python.exe scripts\seed_demo.py
 
-# Create virtual environment
-py -m venv venv              # Windows
-# python3 -m venv venv       # macOS/Linux
-
-# Activate
-venv\Scripts\activate        # Windows
-# source venv/bin/activate   # macOS/Linux
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Copy environment config
-cp .env.example .env
-# (The default .env works out of the box with mock mode)
-
-# Seed demo data (optional but recommended)
-python scripts/seed_demo.py
-
-# Start backend
-uvicorn app.main:app --reload --port 8000
-```
-
-Backend API docs: http://localhost:8000/docs
-
-### 3. Frontend setup
-
-```bash
-cd frontend
-
-# Copy environment config
-cp .env.example .env
-# (Default config uses demo mode — no Firebase needed)
-
-# Install dependencies
+cd ..\frontend
 npm install
+Copy-Item .env.example .env
 
-# Start dev server
-npm run dev
+cd ..
+.\backend\venv\Scripts\python.exe server.py
 ```
-
-Frontend: http://localhost:5173
 
 ---
-
 ## Demo Flow
 
 1. Open http://localhost:5173

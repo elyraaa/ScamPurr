@@ -92,6 +92,6 @@ async def verify_firebase_token(id_token: str) -> Optional[Dict[str, Any]]:
 
         return decoded
 
-except Exception:
-    logger.exception("Firebase token verification failed")
-    return None
+    except Exception:
+        logger.exception("Firebase token verification failed")
+        return None

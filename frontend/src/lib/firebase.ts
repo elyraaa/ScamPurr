@@ -14,6 +14,9 @@ const firebaseConfig = {
 };
 
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
+console.log('VITE_DEMO_MODE =', import.meta.env.VITE_DEMO_MODE);
+console.log('DEMO_MODE =', DEMO_MODE);
+console.log('Firebase Config =', firebaseConfig);
 
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;

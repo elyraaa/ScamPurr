@@ -13,9 +13,8 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup: create DB tables when configured. Shutdown: nothing extra needed."""
-    if settings.AUTO_CREATE_TABLES:
-        create_all_tables()
+    """Startup: create DB tables. Shutdown: nothing extra needed."""
+    create_all_tables()
     yield
 
 

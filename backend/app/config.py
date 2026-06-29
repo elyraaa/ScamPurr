@@ -8,7 +8,6 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "sqlite:///./scampurr.db"
     USE_SQLITE: bool = True
-    AUTO_CREATE_TABLES: bool = True
 
     # Firebase
     FIREBASE_PROJECT_ID: Optional[str] = None

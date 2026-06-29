@@ -211,7 +211,6 @@ http://localhost:8000/docs
 
 - Frontend: https://scam-purr.vercel.app/
 - Backend health: use the Render `/health` endpoint
-- Operations notes: `docs/OPERATIONS.md`
 
 ## Production Settings
 
@@ -221,6 +220,5 @@ Recommended production values:
 - `FIREBASE_MOCK_AUTH=false`
 - `USE_SQLITE=false`
 - `CORS_ORIGINS=https://scam-purr.vercel.app`
-- `AUTO_CREATE_TABLES=true` until Alembic migrations are finalized
 - `RATE_LIMIT_AUTH_PER_MINUTE=20`
 - `RATE_LIMIT_ANALYSIS_PER_MINUTE=10`

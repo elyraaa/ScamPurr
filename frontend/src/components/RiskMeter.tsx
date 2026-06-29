@@ -22,7 +22,7 @@ export function RiskMeter({ score, label, size = 'md', animated = true }: RiskMe
   const circumference = 2 * Math.PI * radius;
   const center = cfg.outer / 2;
 
-  // 270° arc (from 135° to 405°, i.e. -135deg start)
+  // 270 degree arc from 135 to 405 degrees.
   const arcFraction = (score / 100) * 0.75; // 75% of full circle
   const dashoffset = circumference * (1 - arcFraction);
 

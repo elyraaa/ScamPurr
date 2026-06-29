@@ -1,33 +1,30 @@
-import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Shield, Zap, Eye, ChevronRight, Cat, Star } from 'lucide-react';
+import { Cat, ChevronRight, Eye, Shield, Star, Zap } from 'lucide-react';
+import { CatTreeScene } from '../components/pixel';
 
 const FEATURES = [
   {
     icon: Shield,
-    title: 'AI Scam Detection',
-    description: 'Advanced TF-IDF + Random Forest model trained on hundreds of real scam patterns.',
-    color: 'from-violet-500 to-indigo-500',
+    title: 'AI scam scan',
+    description: 'Detects urgency, payment, identity, and verification patterns in adoption listings.',
   },
   {
     icon: Eye,
-    title: 'URL Trust Analysis',
-    description: 'WHOIS domain age, SSL validation, Safe Browsing, and VirusTotal reputation checks.',
-    color: 'from-teal-500 to-cyan-500',
+    title: 'URL trust check',
+    description: 'Reviews shelter websites for domain, SSL, Safe Browsing, and reputation signals.',
   },
   {
     icon: Zap,
-    title: 'Explainable Results',
-    description: 'Every risk score comes with detailed factor breakdown — not just a number.',
-    color: 'from-amber-500 to-orange-500',
+    title: 'Explainable score',
+    description: 'Turns every risk score into clear reasons you can act on before sending money.',
   },
 ];
 
 const STATS = [
-  { value: '12+', label: 'Scam Signals' },
-  { value: '4', label: 'Trust Checks' },
-  { value: '0–100', label: 'Risk Score' },
+  { value: '12+', label: 'Scam signals' },
+  { value: '4', label: 'URL checks' },
+  { value: '0-100', label: 'Risk score' },
   { value: '100%', label: 'Explainable' },
 ];
 
@@ -35,103 +32,88 @@ export function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] relative overflow-hidden">
-      {/* Background orbs */}
-      <div className="orb w-96 h-96 bg-violet-600/20 -top-20 -left-20" />
-      <div className="orb w-80 h-80 bg-indigo-600/15 top-1/3 -right-20" style={{ animationDelay: '3s' }} />
-      <div className="orb w-64 h-64 bg-teal-600/15 bottom-1/4 left-1/4" style={{ animationDelay: '5s' }} />
-
-      {/* Navbar */}
-      <nav className="relative z-10 flex items-center justify-between px-6 py-5 max-w-7xl mx-auto">
+    <div className="page-shell overflow-hidden">
+      <nav className="relative z-10 flex items-center justify-between gap-3 px-4 sm:px-6 py-5 max-w-7xl mx-auto">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
-            <Cat className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 rounded-xl border-[3px] border-[#7e2f51] bg-[#ffd6e8] flex items-center justify-center shadow-[4px_4px_0_rgba(126,47,81,0.22)]">
+            <Cat className="w-5 h-5 text-[#d4537e]" />
           </div>
-          <span className="font-bold text-white text-lg tracking-tight">
-            Scam<span className="text-violet-400">Purr</span>
-            <span className="text-slate-500 font-normal text-base"> AI</span>
+          <span className="font-bold text-[#7e2f51] text-[10px] sm:text-sm tracking-tight whitespace-nowrap">
+            Scam<span className="text-[#d4537e]">Purr</span> AI
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <Link
-            to="/login"
-            className="text-sm text-slate-400 hover:text-white transition-colors px-4 py-2"
-          >
+          <Link to="/login" className="hidden sm:inline-flex text-xs text-[#a55275] hover:text-[#7e2f51] transition-colors px-3 py-2">
             Sign in
           </Link>
-          <Link
-            to="/login"
-            className="btn-primary text-sm text-white font-medium px-5 py-2 rounded-xl"
-          >
-            Get Started
+          <Link to="/login" className="btn-primary text-[10px] sm:text-xs px-3 sm:px-4 py-2 whitespace-nowrap">
+            Start
           </Link>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+      <section className="relative z-10 max-w-7xl mx-auto px-6 pt-12 pb-14 grid lg:grid-cols-[1fr_0.9fr] gap-10 items-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.45 }}
         >
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-sm font-medium mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-[3px] border-[#f4a0c0] bg-[#fff9fc] text-[#d4537e] text-[10px] font-medium mb-7 shadow-[4px_4px_0_rgba(126,47,81,0.16)]">
             <Star className="w-3.5 h-3.5" />
             Coding.Kitty Hackathon 2026
           </div>
 
-          {/* Headline */}
-          <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.05] mb-6">
-            Don't let scammers{' '}
-            <span className="gradient-text">steal your</span>
-            <br />
-            future furball 🐱
+          <h1 className="pixel-title mb-6 max-w-4xl">
+            ScamPurr AI
           </h1>
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10">
-            ScamPurr AI analyzes cat adoption listings and shelter websites for scam signals
-            — and tells you <em>exactly</em> why something looks suspicious.
+          <p className="pixel-body max-w-2xl mb-9">
+            A pink pixel safety desk for cat adoption. Paste a listing or shelter URL and get
+            a clear scam-risk score before you send money, forms, or trust.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             <button
               onClick={() => navigate('/login')}
-              className="btn-primary flex items-center gap-2 text-white font-semibold px-8 py-3.5 rounded-xl text-base w-full sm:w-auto justify-center"
+              className="btn-primary flex w-full sm:w-auto items-center justify-center gap-2 px-7 py-3.5 text-xs"
             >
-              Start analyzing for free
+              Start scanning
               <ChevronRight className="w-4 h-4" />
             </button>
             <Link
               to="/login"
-              className="flex items-center gap-2 text-slate-400 hover:text-white text-sm px-4 py-3 transition-colors"
+              className="flex items-center justify-center gap-2 text-[#a55275] hover:text-[#7e2f51] text-xs px-4 py-3 transition-colors"
             >
               <Cat className="w-4 h-4" />
-              Try demo mode — no sign up needed
+              Try demo mode
             </Link>
           </div>
         </motion.div>
 
-        {/* Stats bar */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4"
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.12 }}
+          className="min-w-0"
         >
-          {STATS.map((stat) => (
-            <div key={stat.label} className="glass-card rounded-2xl p-6 text-center">
-              <div className="text-3xl font-black gradient-text mb-1">{stat.value}</div>
-              <div className="text-sm text-slate-500">{stat.label}</div>
-            </div>
-          ))}
+          <CatTreeScene />
         </motion.div>
       </section>
 
-      {/* Features */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-white mb-3">How ScamPurr protects you</h2>
-          <p className="text-slate-400">Three layers of analysis, all explainable.</p>
+      <section className="relative z-10 max-w-5xl mx-auto px-6 pb-14">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {STATS.map((stat) => (
+            <div key={stat.label} className="glass-card p-5 text-center">
+              <div className="text-xl md:text-2xl font-black text-[#d4537e] mb-2">{stat.value}</div>
+              <div className="text-[10px] text-[#a55275]">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="relative z-10 max-w-5xl mx-auto px-6 py-12">
+        <div className="text-center mb-10">
+          <p className="pixel-kicker mb-3">How it helps</p>
+          <h2 className="text-xl md:text-2xl font-bold text-[#7e2f51]">Three checks, one calm answer</h2>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
           {FEATURES.map((feat, i) => (
@@ -139,43 +121,34 @@ export function LandingPage() {
               key={feat.title}
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 + i * 0.1 }}
-              className="glass-card rounded-2xl p-6 hover:border-violet-500/30 transition-all duration-300 group"
+              transition={{ duration: 0.45, delay: 0.1 + i * 0.08 }}
+              className="glass-card p-6"
             >
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feat.color} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                <feat.icon className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 rounded-xl border-[3px] border-[#7e2f51] bg-[#ffd6e8] flex items-center justify-center mb-5 shadow-[3px_3px_0_rgba(126,47,81,0.18)]">
+                <feat.icon className="w-6 h-6 text-[#d4537e]" />
               </div>
-              <h3 className="text-white font-semibold text-lg mb-2">{feat.title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">{feat.description}</p>
+              <h3 className="text-[#7e2f51] font-semibold text-sm mb-3">{feat.title}</h3>
+              <p className="text-[#a55275] text-xs leading-relaxed">{feat.description}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="relative z-10 max-w-3xl mx-auto px-6 py-16 text-center">
-        <div className="glass-card rounded-3xl p-12 border-violet-500/20 relative overflow-hidden">
-          <div className="orb w-64 h-64 bg-violet-600/20 -top-10 -right-10" />
-          <div className="relative z-10">
-            <div className="text-5xl mb-4">🙀</div>
-            <h2 className="text-3xl font-bold text-white mb-3">Ready to sniff out scammers?</h2>
-            <p className="text-slate-400 mb-8">Join thousands of cat lovers who use ScamPurr to adopt safely.</p>
-            <button
-              onClick={() => navigate('/login')}
-              className="btn-primary text-white font-semibold px-8 py-3.5 rounded-xl"
-            >
-              Analyze a listing now 🐾
-            </button>
-          </div>
+      <section className="relative z-10 max-w-3xl mx-auto px-6 py-12 text-center">
+        <div className="glass-card p-8 md:p-10">
+          <Cat className="w-10 h-10 mx-auto mb-5 text-[#d4537e]" />
+          <h2 className="text-lg md:text-xl font-bold text-[#7e2f51] mb-4">Ready to check a listing?</h2>
+          <p className="pixel-body mb-7">
+            ScamPurr keeps the analysis playful, but the risk signals are serious.
+          </p>
+          <button onClick={() => navigate('/login')} className="btn-primary px-7 py-3 text-xs">
+            Analyze now
+          </button>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 text-center py-8 text-slate-600 text-sm border-t border-white/5">
-        ScamPurr AI | Coding.Kitty Hackathon 2026 | Built with TypeScript |{' '}
-        <Link to="/privacy" className="hover:text-slate-400 transition-colors">
-          Privacy
-        </Link>
+      <footer className="relative z-10 text-center py-8 text-[#a55275] text-[10px] border-t-[3px] border-[#f4a0c0] bg-[#fff9fc]/80">
+        ScamPurr AI / Coding.Kitty Hackathon 2026 / Built with TypeScript
       </footer>
     </div>
   );

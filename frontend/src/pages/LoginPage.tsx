@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Cat, Loader2, Shield, Zap } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-
-const getErrorMessage = (error: unknown, fallback: string): string => (
-  error instanceof Error ? error.message : fallback
-);
+import { useAuth } from '../context/useAuth';
+import { getErrorMessage } from '../lib/errors';
 
 export function LoginPage() {
   const { user, loading, login, demoLogin } = useAuth();
@@ -25,7 +22,7 @@ export function LoginPage() {
     try {
       await login();
       navigate('/dashboard');
-    } catch (error: unknown) {
+    } catch (error) {
       setError(getErrorMessage(error, 'Sign-in failed. Please try again.'));
     } finally {
       setIsLoading(false);
@@ -38,7 +35,7 @@ export function LoginPage() {
     try {
       await demoLogin();
       navigate('/dashboard');
-    } catch (error: unknown) {
+    } catch (error) {
       setError(getErrorMessage(error, 'Demo login failed.'));
     } finally {
       setIsDemoLoading(false);
@@ -46,11 +43,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Orbs */}
-      <div className="orb w-96 h-96 bg-violet-600/20 -top-20 -left-20" />
-      <div className="orb w-80 h-80 bg-indigo-600/15 bottom-0 right-0" style={{ animationDelay: '3s' }} />
-
+    <div className="page-shell flex min-h-screen items-center justify-center px-4 overflow-hidden">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -58,11 +51,11 @@ export function LoginPage() {
         className="relative z-10 w-full max-w-md"
       >
         {/* Card */}
-        <div className="glass-card rounded-3xl p-10 border border-white/10">
+        <div className="glass-card rounded-3xl p-10">
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 shadow-2xl shadow-violet-500/30 mb-5 glow-violet">
-              <Cat className="w-8 h-8 text-white" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl border-[3px] border-[#7e2f51] bg-[#ffd6e8] shadow-[5px_5px_0_rgba(126,47,81,0.22)] mb-5">
+              <Cat className="w-8 h-8 text-[#d4537e]" />
             </div>
             <h1 className="text-2xl font-bold text-white">ScamPurr AI</h1>
             <p className="text-slate-400 text-sm mt-1.5">
@@ -104,7 +97,7 @@ export function LoginPage() {
                 <div className="w-full border-t border-white/8" />
               </div>
               <div className="relative flex justify-center text-xs text-slate-500">
-                <span className="bg-[#0f1629] px-3">or</span>
+                <span className="bg-[#fff9fc] px-3">or</span>
               </div>
             </div>
 
@@ -118,9 +111,9 @@ export function LoginPage() {
               {isDemoLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                <span className="text-lg">🐾</span>
+                <Cat className="w-5 h-5" />
               )}
-              Try Demo Mode — no sign up
+              Try Demo Mode - no sign up
             </button>
           </div>
 
@@ -139,10 +132,7 @@ export function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-slate-600 mt-6">
-          ScamPurr AI | Coding.Kitty Hackathon 2026 |{' '}
-          <Link to="/privacy" className="hover:text-slate-400 transition-colors">
-            Privacy
-          </Link>
+          ScamPurr AI / Coding.Kitty Hackathon 2026
         </p>
       </motion.div>
     </div>

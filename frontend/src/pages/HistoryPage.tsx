@@ -19,7 +19,7 @@ export function HistoryPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e]">
+    <div className="page-shell">
       <Navbar />
       <div className="page-content max-w-3xl mx-auto">
         <motion.div

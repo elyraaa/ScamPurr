@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ExternalLink, AlertTriangle, CheckCircle, Loader2, FileText, Globe } from 'lucide-react';
+import { ArrowLeft, ExternalLink, AlertTriangle, CheckCircle, FileText, Globe } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
 import { RiskMeter } from '../components/RiskMeter';
 import { ExplainCard } from '../components/ExplainCard';
+import { ChasingCatLoader, RiskCat, SleepingCat } from '../components/pixel';
 import { api } from '../lib/axios';
 import { cn, getRiskBg, formatDate } from '../lib/utils';
 import type { FullAnalysisResponse } from '../types';
@@ -26,26 +27,20 @@ export function ResultPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0f1e] flex items-center justify-center">
+      <div className="page-shell flex min-h-screen items-center justify-center">
         <Navbar />
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 text-violet-400 animate-spin" />
-          <div className="paw-loader flex gap-2 text-2xl">
-            <span>🐾</span><span>🐾</span><span>🐾</span>
-          </div>
-          <p className="text-slate-400 text-sm">Loading analysis result…</p>
-        </div>
+        <ChasingCatLoader label="loading analysis result..." />
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-[#0a0f1e]">
+      <div className="page-shell">
         <Navbar />
         <div className="page-content flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-5xl mb-4">😿</div>
+          <div className="pixel-card max-w-xl p-8 text-center">
+            <SleepingCat />
             <p className="text-red-400 text-lg font-semibold">Failed to load result</p>
             <p className="text-slate-500 text-sm mt-1 mb-6">{error}</p>
             <button
@@ -65,25 +60,14 @@ export function ResultPage() {
   const trustSignals = risk_score.explanations.filter(e => !e.is_red_flag);
 
   const TYPE_LABEL: Record<string, string> = {
-    listing: '📄 Listing Analysis',
-    url: '🔗 URL Analysis',
-    combined: '🔍 Combined Analysis',
+    listing: 'Listing Analysis',
+    url: 'URL Analysis',
+    combined: 'Combined Analysis',
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e]">
+    <div className="page-shell">
       <Navbar />
-
-      {/* Orbs */}
-      <div className="fixed inset-0 pointer-events-none">
-        {risk_score.risk_label === 'CRITICAL' && (
-          <div className="orb w-96 h-96 bg-red-600/10 top-0 right-0" />
-        )}
-        {risk_score.risk_label === 'LOW' && (
-          <div className="orb w-96 h-96 bg-emerald-600/10 top-0 right-0" />
-        )}
-        <div className="orb w-64 h-64 bg-violet-600/8 bottom-0 left-0" style={{ animationDelay: '3s' }} />
-      </div>
 
       <div className="page-content max-w-4xl mx-auto relative z-10">
         {/* Back */}
@@ -107,7 +91,7 @@ export function ResultPage() {
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
               {TYPE_LABEL[type]}
             </span>
-            <span className="text-slate-700">·</span>
+            <span className="text-slate-700">/</span>
             <span className="text-xs text-slate-500">{formatDate(created_at)}</span>
           </div>
           <h1 className="text-2xl font-bold text-white">Risk Analysis Report</h1>
@@ -235,11 +219,12 @@ export function ResultPage() {
                 ? 'bg-amber-500/8 border-amber-500/25'
                 : 'bg-red-500/8 border-red-500/25'
             )}>
+              <RiskCat risk={risk_score.risk_label} />
               <div className="text-xl mb-2">
-                {risk_score.risk_label === 'LOW' ? '😺 Looking good!' :
-                 risk_score.risk_label === 'MEDIUM' ? '🐱 Proceed with caution' :
-                 risk_score.risk_label === 'HIGH' ? '😾 High risk detected' :
-                 '🙀 Do NOT proceed!'}
+                {risk_score.risk_label === 'LOW' ? 'Looking good!' :
+                 risk_score.risk_label === 'MEDIUM' ? 'Proceed with caution' :
+                 risk_score.risk_label === 'HIGH' ? 'High risk detected' :
+                 'Do NOT proceed!'}
               </div>
               <p className="text-sm text-slate-300 leading-relaxed">
                 {risk_score.risk_label === 'LOW' &&

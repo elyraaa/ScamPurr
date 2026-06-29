@@ -38,15 +38,15 @@ export function getRiskBg(label: string): string {
 export function getRiskEmoji(label: string): string {
   switch (label) {
     case 'LOW':
-      return '😺';
+      return 'OK';
     case 'MEDIUM':
-      return '🐱';
+      return '?';
     case 'HIGH':
-      return '😾';
+      return '!';
     case 'CRITICAL':
-      return '🙀';
+      return '!!';
     default:
-      return '🐾';
+      return '-';
   }
 }
 
@@ -69,5 +69,5 @@ export function formatDate(dateStr: string): string {
 
 export function truncate(str: string, maxLength: number): string {
   if (str.length <= maxLength) return str;
-  return str.slice(0, maxLength) + '…';
+  return str.slice(0, maxLength) + '...';
 }

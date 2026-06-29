@@ -4,9 +4,11 @@ import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Loader2, AlertCircle, Globe, Info } from 'lucide-react';
+import { Search, AlertCircle, Globe, Info } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
+import { ScanningCatLoader } from '../components/pixel';
 import { api } from '../lib/axios';
+import { getErrorMessage } from '../lib/errors';
 import type { FullAnalysisResponse } from '../types';
 
 const schema = z.object({
@@ -15,22 +17,14 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
-type ListingPayload = {
-  text: string;
-  url?: string;
-};
-
-const getErrorMessage = (error: unknown, fallback: string): string => (
-  error instanceof Error ? error.message : fallback
-);
 
 const SAMPLE_TEXTS = [
   {
-    label: '🙀 Scam Example',
-    text: `Beautiful Persian kittens FREE! I'm going through a divorce and need urgent rehoming. Act now — only 2 left! You only need to pay a $200 shipping fee via Western Union or gift card. Cannot meet in person — will ship nationwide. Contact me at persians4u@gmail.com. God bless you!`,
+    label: 'Scam Example',
+    text: `Beautiful Persian kittens FREE! I'm going through a divorce and need urgent rehoming. Act now - only 2 left! You only need to pay a $200 shipping fee via Western Union or gift card. Cannot meet in person - will ship nationwide. Contact me at persians4u@gmail.com. God bless you!`,
   },
   {
-    label: '😺 Legit Example',
+    label: 'Legit Example',
     text: `Our registered non-profit rescue has 3 kittens ready for adoption. All are vaccinated, microchipped, and spayed/neutered. Adoption application required. Adoption fee $75 covers vet costs. Please visit our shelter to meet them in person on weekends. Full vet records provided.`,
   },
 ];
@@ -40,7 +34,7 @@ export function ListingAnalysisPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { register, handleSubmit, setValue, control, formState: { errors } } = useForm<FormData>({
+  const { register, control, handleSubmit, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
@@ -50,11 +44,11 @@ export function ListingAnalysisPage() {
     setSubmitting(true);
     setError(null);
     try {
-      const payload: ListingPayload = { text: data.text };
+      const payload: { text: string; url?: string } = { text: data.text };
       if (data.url) payload.url = data.url;
       const res = await api.post<FullAnalysisResponse>('/analyses/listing', payload);
       navigate(`/result/${res.data.analysis_id}`);
-    } catch (error: unknown) {
+    } catch (error) {
       setError(getErrorMessage(error, 'Analysis failed. Please try again.'));
     } finally {
       setSubmitting(false);
@@ -62,7 +56,7 @@ export function ListingAnalysisPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e]">
+    <div className="page-shell">
       <Navbar />
 
       <div className="page-content max-w-3xl mx-auto">
@@ -116,7 +110,7 @@ export function ListingAnalysisPage() {
                 id="listing-text"
                 {...register('text')}
                 rows={8}
-                placeholder="Paste the full adoption listing text here… include everything the seller wrote, including contact info, pricing, and any special conditions."
+                placeholder="Paste the full adoption listing text here... include everything the seller wrote, including contact info, pricing, and any special conditions."
                 className="input-dark w-full rounded-xl px-4 py-3 text-sm resize-none"
               />
               {errors.text && (
@@ -133,7 +127,7 @@ export function ListingAnalysisPage() {
                 <Globe className="w-4 h-4 text-slate-400" />
                 <label className="text-sm font-semibold text-slate-300" htmlFor="listing-url">
                   Shelter / Listing URL{' '}
-                  <span className="text-slate-600 font-normal">(optional — runs combined analysis)</span>
+                  <span className="text-slate-600 font-normal">(optional - runs combined analysis)</span>
                 </label>
               </div>
               <input
@@ -183,14 +177,11 @@ export function ListingAnalysisPage() {
               className="btn-primary w-full flex items-center justify-center gap-3 text-white font-semibold py-4 rounded-xl text-base disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Analyzing listing…
-                </>
+                <ScanningCatLoader compact />
               ) : (
                 <>
                   <Search className="w-5 h-5" />
-                  Analyze for Scam Signals 🐾
+                  Analyze for Scam Signals
                 </>
               )}
             </button>

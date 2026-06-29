@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Clock, ChevronRight } from 'lucide-react';
+import { SleepingCat } from './pixel';
 import { cn, getRiskBg, getRiskEmoji, formatDate, truncate } from '../lib/utils';
 import type { HistoryItem } from '../types';
 
@@ -11,9 +12,9 @@ interface HistoryTableProps {
 }
 
 const TYPE_LABELS = {
-  listing: '📄 Listing',
-  url: '🔗 URL',
-  combined: '🔍 Combined',
+  listing: 'Listing',
+  url: 'URL',
+  combined: 'Combined',
 };
 
 export function HistoryTable({ items, loading = false }: HistoryTableProps) {
@@ -32,7 +33,8 @@ export function HistoryTable({ items, loading = false }: HistoryTableProps) {
   if (items.length === 0) {
     return (
       <div className="text-center py-16 text-slate-500">
-        <Clock className="w-12 h-12 mx-auto mb-3 opacity-30" />
+        <SleepingCat />
+        <Clock className="w-8 h-8 mx-auto mb-3 opacity-30" />
         <p className="text-base font-medium">No analyses yet</p>
         <p className="text-sm mt-1 opacity-70">Run your first scam check to see results here.</p>
       </div>
@@ -61,7 +63,7 @@ export function HistoryTable({ items, loading = false }: HistoryTableProps) {
               <span className="text-xs text-slate-500 font-medium">
                 {TYPE_LABELS[item.type] || item.type}
               </span>
-              <span className="text-slate-700">·</span>
+              <span className="text-slate-700">/</span>
               <span className="text-xs text-slate-500">{formatDate(item.created_at)}</span>
             </div>
             <p className="text-sm text-slate-300 truncate">
@@ -69,7 +71,7 @@ export function HistoryTable({ items, loading = false }: HistoryTableProps) {
                 ? item.input_url
                 : item.input_text
                 ? truncate(item.input_text, 80)
-                : '—'}
+                : '-'}
             </p>
           </div>
 

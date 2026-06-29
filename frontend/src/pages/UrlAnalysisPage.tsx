@@ -4,9 +4,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Loader2, AlertCircle, Info, Shield, ExternalLink } from 'lucide-react';
+import { Globe, AlertCircle, Info, Shield, ExternalLink } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
+import { ScanningCatLoader } from '../components/pixel';
 import { api } from '../lib/axios';
+import { getErrorMessage } from '../lib/errors';
 import type { FullAnalysisResponse } from '../types';
 
 const schema = z.object({
@@ -18,14 +20,10 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-const getErrorMessage = (error: unknown, fallback: string): string => (
-  error instanceof Error ? error.message : fallback
-);
-
 const SAMPLE_URLS = [
-  { label: '🙀 Risky URL', url: 'http://free-persian-kittens.tk/adopt-now' },
-  { label: '😺 Safe URL', url: 'https://www.aspca.org/adopt-pet' },
-  { label: '😾 Suspicious', url: 'http://cutekittens4u.xyz/adopt' },
+  { label: 'Risky URL', url: 'http://free-persian-kittens.tk/adopt-now' },
+  { label: 'Safe URL', url: 'https://www.aspca.org/adopt-pet' },
+  { label: 'Suspicious', url: 'http://cutekittens4u.xyz/adopt' },
 ];
 
 const CHECKS = [
@@ -50,7 +48,7 @@ export function UrlAnalysisPage() {
     try {
       const res = await api.post<FullAnalysisResponse>('/analyses/url', { url: data.url });
       navigate(`/result/${res.data.analysis_id}`);
-    } catch (error: unknown) {
+    } catch (error) {
       setError(getErrorMessage(error, 'URL analysis failed. Please try again.'));
     } finally {
       setSubmitting(false);
@@ -58,7 +56,7 @@ export function UrlAnalysisPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e]">
+    <div className="page-shell">
       <Navbar />
 
       <div className="page-content max-w-3xl mx-auto">
@@ -170,14 +168,11 @@ export function UrlAnalysisPage() {
               className="btn-primary w-full flex items-center justify-center gap-3 text-white font-semibold py-4 rounded-xl text-base disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Scanning URL…
-                </>
+                <ScanningCatLoader compact />
               ) : (
                 <>
                   <Globe className="w-5 h-5" />
-                  Check URL Trust Score 🔍
+                  Check URL Trust Score
                 </>
               )}
             </button>

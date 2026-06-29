@@ -1,6 +1,7 @@
-from pydantic_settings import BaseSettings
 from functools import lru_cache
-from typing import Optional, List
+from typing import Optional
+
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -11,6 +12,7 @@ class Settings(BaseSettings):
     # ── Firebase ──────────────────────────────────
     FIREBASE_PROJECT_ID: Optional[str] = None
     FIREBASE_CREDENTIALS_PATH: Optional[str] = None
+    FIREBASE_SERVICE_ACCOUNT_JSON: Optional[str] = None
     FIREBASE_MOCK_AUTH: bool = True
 
     # ── External APIs ─────────────────────────────
@@ -28,12 +30,14 @@ class Settings(BaseSettings):
     APP_NAME: str = "ScamPurr AI"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = True
-    CORS_ORIGINS: List[str] = [
-        "http://localhost:5173",
-        "http://localhost:3000",
-    ]
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    # Comma-separated origins
+    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+
+    model_config = {
+        "env_file": ".env",
+        "env_file_encoding": "utf-8",
+    }
 
 
 @lru_cache()

@@ -210,15 +210,5 @@ http://localhost:8000/docs
 ## Deployment
 
 - Frontend: https://scam-purr.vercel.app/
-- Backend health: use the Render `/health` endpoint
+- Backend health:https://scampurr.onrender.com/health
 
-## Production Settings
-
-Recommended production values:
-
-- `VITE_DEMO_MODE=false`
-- `FIREBASE_MOCK_AUTH=false`
-- `USE_SQLITE=false`
-- `CORS_ORIGINS=https://scam-purr.vercel.app`
-- `RATE_LIMIT_AUTH_PER_MINUTE=20`
-- `RATE_LIMIT_ANALYSIS_PER_MINUTE=10`

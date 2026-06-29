@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,6 +15,14 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
+type ListingPayload = {
+  text: string;
+  url?: string;
+};
+
+const getErrorMessage = (error: unknown, fallback: string): string => (
+  error instanceof Error ? error.message : fallback
+);
 
 const SAMPLE_TEXTS = [
   {
@@ -32,22 +40,22 @@ export function ListingAnalysisPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, setValue, control, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
-  const textValue = watch('text', '');
+  const textValue = useWatch({ control, name: 'text', defaultValue: '' });
 
   const onSubmit = async (data: FormData) => {
     setSubmitting(true);
     setError(null);
     try {
-      const payload: any = { text: data.text };
+      const payload: ListingPayload = { text: data.text };
       if (data.url) payload.url = data.url;
       const res = await api.post<FullAnalysisResponse>('/analyses/listing', payload);
       navigate(`/result/${res.data.analysis_id}`);
-    } catch (e: any) {
-      setError(e.message || 'Analysis failed. Please try again.');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Analysis failed. Please try again.'));
     } finally {
       setSubmitting(false);
     }

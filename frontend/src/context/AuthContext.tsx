@@ -3,6 +3,7 @@ import { api, setAuthToken } from '../lib/axios';
 import { DEMO_MODE, DEMO_TOKEN, auth } from '../lib/firebase';
 import type { User, AuthContextType } from '../types';
 
+/* eslint-disable react-refresh/only-export-components */
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -21,61 +22,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Check if already demo-logged in (persisted in sessionStorage)
       const savedToken = sessionStorage.getItem('scampurr_token');
       if (savedToken) {
-        setToken(savedToken);
-        setAuthToken(savedToken);
-        verifyWithBackend(savedToken)
+        Promise.resolve()
+          .then(() => {
+            setToken(savedToken);
+            setAuthToken(savedToken);
+            return verifyWithBackend(savedToken);
+          })
           .then(setUser)
           .catch(() => {
             sessionStorage.removeItem('scampurr_token');
           })
           .finally(() => setLoading(false));
       } else {
-        setLoading(false);
+        Promise.resolve().then(() => setLoading(false));
       }
       return;
     }
 
     // Real Firebase auth listener
     if (!auth) {
-      setLoading(false);
+      Promise.resolve().then(() => setLoading(false));
       return;
     }
 
     let unsubscribe: (() => void) | undefined;
     import('firebase/auth').then(({ onAuthStateChanged }) => {
       unsubscribe = onAuthStateChanged(auth!, async (firebaseUser) => {
-        console.log("========== AUTH STATE ==========");
-        console.log("Firebase User:", firebaseUser);
-
         if (firebaseUser) {
           try {
-            console.log("Getting Firebase ID Token...");
-
             const idToken = await firebaseUser.getIdToken();
-
-            console.log("ID Token:", idToken.substring(0, 40) + "...");
 
             setToken(idToken);
             setAuthToken(idToken);
 
-            console.log("Calling backend /auth/verify...");
-
             const dbUser = await verifyWithBackend(idToken);
-
-            console.log("Backend User:", dbUser);
 
             setUser(dbUser);
 
-          } catch (e) {
-            console.error("AUTH FLOW ERROR:", e);
-
+          } catch {
             setUser(null);
             setToken(null);
             setAuthToken(null);
           }
         } else {
-          console.log("No Firebase user");
-
           setUser(null);
           setToken(null);
           setAuthToken(null);
@@ -95,23 +84,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (!auth) {
-      console.error("Firebase Auth is null");
       return;
     }
 
-    const { GoogleAuthProvider, signInWithPopup } = await import("firebase/auth");
+    const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
 
     const provider = new GoogleAuthProvider();
 
-    try {
-      const result = await signInWithPopup(auth, provider);
-
-      console.log("Google Sign-In Success:", result.user);
-
-    } catch (error) {
-      console.error("Google Sign-In Error:", error);
-      throw error;
-    }
+    await signInWithPopup(auth, provider);
   };
 
   const demoLogin = async () => {
@@ -122,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const dbUser = await verifyWithBackend(demoToken);
       setUser(dbUser);
-    } catch (e) {
+    } catch {
       // Backend not up yet — create a local demo user object
       setUser({
         id: 'demo-local',

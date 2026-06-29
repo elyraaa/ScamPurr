@@ -10,7 +10,11 @@ services:
       - key: USE_SQLITE
         value: "false"
       - key: FIREBASE_MOCK_AUTH
-        value: "true"
+        value: "false"
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
       - key: USE_MOCK_ML
         value: "false"
       - key: MODEL_PATH

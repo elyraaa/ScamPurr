@@ -1,5 +1,4 @@
 import { initializeApp, getApps } from 'firebase/app';
-import type { FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import type { Auth } from 'firebase/auth';
 
@@ -14,15 +13,11 @@ const firebaseConfig = {
 };
 
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
-console.log("VITE_DEMO_MODE =", import.meta.env.VITE_DEMO_MODE);
-console.log("DEMO_MODE =", DEMO_MODE);
-console.log("API =", import.meta.env.VITE_API_BASE_URL);
 
-let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 
 if (!DEMO_MODE) {
-  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+  const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
   auth = getAuth(app);
 }
 

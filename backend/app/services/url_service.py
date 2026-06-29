@@ -236,8 +236,7 @@ async def _check_ssl(hostname: str) -> tuple[bool, Optional[str]]:
                 issuer = dict(x[0] for x in cert.get("issuer", []))
                 issuer_name = issuer.get("organizationName", "Unknown")
                 return True, issuer_name
-    except Exception as e:
-        logger.debug(f"SSL check failed for {hostname}: {e}")
+    except Exception:
         return False, None
 
 
@@ -252,8 +251,8 @@ async def _check_whois(hostname: str) -> Optional[int]:
         if creation:
             age = (datetime.now(timezone.utc) - creation.replace(tzinfo=timezone.utc)).days
             return max(0, age)
-    except Exception as e:
-        logger.debug(f"WHOIS failed for {hostname}: {e}")
+    except Exception:
+        pass
     return None
 
 

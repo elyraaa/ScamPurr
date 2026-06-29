@@ -4,6 +4,10 @@ import { motion } from 'framer-motion';
 import { Cat, Loader2, Shield, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+const getErrorMessage = (error: unknown, fallback: string): string => (
+  error instanceof Error ? error.message : fallback
+);
+
 export function LoginPage() {
   const { user, loading, login, demoLogin } = useAuth();
   const navigate = useNavigate();
@@ -21,8 +25,8 @@ export function LoginPage() {
     try {
       await login();
       navigate('/dashboard');
-    } catch (e: any) {
-      setError(e.message || 'Sign-in failed. Please try again.');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Sign-in failed. Please try again.'));
     } finally {
       setIsLoading(false);
     }
@@ -34,8 +38,8 @@ export function LoginPage() {
     try {
       await demoLogin();
       navigate('/dashboard');
-    } catch (e: any) {
-      setError(e.message || 'Demo login failed.');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Demo login failed.'));
     } finally {
       setIsDemoLoading(false);
     }

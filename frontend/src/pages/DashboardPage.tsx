@@ -38,7 +38,7 @@ export function DashboardPage() {
   useEffect(() => {
     api.get<HistoryItem[]>('/analyses/history?limit=5')
       .then(res => setHistory(res.data))
-      .catch(console.error)
+      .catch(() => setHistory([]))
       .finally(() => setLoadingHistory(false));
   }, []);
 

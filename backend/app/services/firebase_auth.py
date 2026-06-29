@@ -47,30 +47,23 @@ def _init_firebase():
             cred = credentials.ApplicationDefault()
 
         firebase_admin.initialize_app(cred)
-
         _firebase_initialized = True
 
         logger.info("Firebase Admin SDK initialized successfully.")
-        logger.info(f"FIREBASE_MOCK_AUTH = {settings.FIREBASE_MOCK_AUTH}")
-
         return True
 
     except Exception:
         logger.exception("Firebase initialization failed")
         return False
 
+
 async def verify_firebase_token(id_token: str) -> Optional[Dict[str, Any]]:
     """
     Verify a Firebase ID token and return the decoded claims dict,
     or None if verification fails.
     """
-
-    logger.info(f"FIREBASE_MOCK_AUTH = {settings.FIREBASE_MOCK_AUTH}")
-
     # ── Mock Mode ─────────────────────────────────────────────────────
     if settings.FIREBASE_MOCK_AUTH:
-        logger.info("Using MOCK Firebase authentication")
-
         return {
             "uid": id_token,
             "email": f"{id_token.replace(' ', '_')}@demo.scampurr.ai",
@@ -86,12 +79,9 @@ async def verify_firebase_token(id_token: str) -> Optional[Dict[str, Any]]:
     try:
         from firebase_admin import auth as firebase_auth
 
-        logger.info("Using REAL Firebase authentication")
-
         decoded = firebase_auth.verify_id_token(id_token)
-
         return decoded
 
     except Exception:
-        logger.exception("Firebase token verification failed")
+        logger.warning("Firebase token verification failed (invalid or expired token)")
         return None

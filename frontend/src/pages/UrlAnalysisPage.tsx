@@ -18,6 +18,10 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+const getErrorMessage = (error: unknown, fallback: string): string => (
+  error instanceof Error ? error.message : fallback
+);
+
 const SAMPLE_URLS = [
   { label: '🙀 Risky URL', url: 'http://free-persian-kittens.tk/adopt-now' },
   { label: '😺 Safe URL', url: 'https://www.aspca.org/adopt-pet' },
@@ -46,8 +50,8 @@ export function UrlAnalysisPage() {
     try {
       const res = await api.post<FullAnalysisResponse>('/analyses/url', { url: data.url });
       navigate(`/result/${res.data.analysis_id}`);
-    } catch (e: any) {
-      setError(e.message || 'URL analysis failed. Please try again.');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'URL analysis failed. Please try again.'));
     } finally {
       setSubmitting(false);
     }

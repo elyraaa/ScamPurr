@@ -61,32 +61,37 @@ async def analyze_listing_text(
     Analyze an adoption listing text for scam signals.
     Optionally include a URL to perform a combined analysis.
     """
-    logger.info(f"Listing analysis requested by user {current_user.id}")
+    try:
+        analysis_type = AnalysisType.COMBINED if body.url else AnalysisType.LISTING
+        analysis = Analysis(
+            id=str(uuid.uuid4()),
+            user_id=current_user.id,
+            type=analysis_type,
+            input_text=body.text,
+            input_url=body.url,
+        )
+        db.add(analysis)
+        db.commit()
 
-    analysis_type = AnalysisType.COMBINED if body.url else AnalysisType.LISTING
-    analysis = Analysis(
-        id=str(uuid.uuid4()),
-        user_id=current_user.id,
-        type=analysis_type,
-        input_text=body.text,
-        input_url=body.url,
-    )
-    db.add(analysis)
-    db.commit()
+        ml_result = analyze_listing(body.text)
 
-    # Run ML analysis
-    ml_result = analyze_listing(body.text)
+        url_result = None
+        if body.url:
+            url_result = await analyze_url(body.url)
 
-    # Run URL analysis if URL provided
-    url_result = None
-    if body.url:
-        url_result = await analyze_url(body.url)
+        compute_and_save_score(db, analysis, ml_result, url_result)
+        db.refresh(analysis)
 
-    # Compute and persist scores
-    risk_score = compute_and_save_score(db, analysis, ml_result, url_result)
-    db.refresh(analysis)
-
-    return _build_full_response(analysis)
+        return _build_full_response(analysis)
+    except HTTPException:
+        raise
+    except Exception:
+        db.rollback()
+        logger.exception("Listing analysis failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unable to complete listing analysis",
+        )
 
 
 @router.post("/url", response_model=FullAnalysisResponse)
@@ -96,22 +101,30 @@ async def analyze_shelter_url(
     current_user: User = Depends(get_current_user),
 ):
     """Analyze a shelter or listing website URL for trust signals."""
-    logger.info(f"URL analysis requested by user {current_user.id}: {body.url}")
+    try:
+        analysis = Analysis(
+            id=str(uuid.uuid4()),
+            user_id=current_user.id,
+            type=AnalysisType.URL,
+            input_url=body.url,
+        )
+        db.add(analysis)
+        db.commit()
 
-    analysis = Analysis(
-        id=str(uuid.uuid4()),
-        user_id=current_user.id,
-        type=AnalysisType.URL,
-        input_url=body.url,
-    )
-    db.add(analysis)
-    db.commit()
+        url_result = await analyze_url(body.url)
+        compute_and_save_score(db, analysis, ml_result=None, url_result=url_result)
+        db.refresh(analysis)
 
-    url_result = await analyze_url(body.url)
-    risk_score = compute_and_save_score(db, analysis, ml_result=None, url_result=url_result)
-    db.refresh(analysis)
-
-    return _build_full_response(analysis)
+        return _build_full_response(analysis)
+    except HTTPException:
+        raise
+    except Exception:
+        db.rollback()
+        logger.exception("URL analysis failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unable to complete URL analysis",
+        )
 
 
 @router.get("/history", response_model=List[HistoryItemResponse])

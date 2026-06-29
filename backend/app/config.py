@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     FIREBASE_PROJECT_ID: Optional[str] = None
     FIREBASE_CREDENTIALS_PATH: Optional[str] = None
     FIREBASE_SERVICE_ACCOUNT_JSON: Optional[str] = None
-    FIREBASE_MOCK_AUTH: bool = True
+    FIREBASE_MOCK_AUTH: bool = False
 
     # ── External APIs ─────────────────────────────
     GOOGLE_SAFE_BROWSING_API_KEY: Optional[str] = None
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     # ── App ───────────────────────────────────────
     APP_NAME: str = "ScamPurr AI"
     APP_VERSION: str = "1.0.0"
-    DEBUG: bool = True
+    DEBUG: bool = False
 
     # Comma-separated origins
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"

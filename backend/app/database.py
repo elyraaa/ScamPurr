@@ -5,8 +5,17 @@ from app.config import get_settings
 settings = get_settings()
 
 connect_args: dict = {}
+pool_kwargs: dict = {}
+
 if settings.USE_SQLITE:
+    # SQLite doesn't support server-side pooling args
     connect_args = {"check_same_thread": False}
+else:
+    # PostgreSQL — use connection pooling appropriate for serverless/Render
+    pool_kwargs = {
+        "pool_size": 5,
+        "max_overflow": 10,
+    }
 
 engine = create_engine(
     settings.DATABASE_URL,
@@ -14,6 +23,7 @@ engine = create_engine(
     echo=settings.DEBUG,
     pool_pre_ping=True,
     pool_recycle=300,
+    **pool_kwargs,
 )
 
 SessionLocal = sessionmaker(

@@ -54,7 +54,7 @@ ScamPurr AI analyzes suspicious cat adoption listings and shelter websites, then
 ### 1. Open the project
 
 ```powershell
-cd "C:\..."
+cd scampurr-ai
 ```
 
 ### 2. Run the app
@@ -83,7 +83,9 @@ cd ..
 .\backend\.venv\Scripts\python.exe server.py
 ```
 
----## Demo Flow
+---
+
+## Demo Flow
 
 1. Open http://localhost:5173
 2. Click **Try Demo Mode** on the login page (no Firebase setup needed)
@@ -224,12 +226,12 @@ Set these Render environment variables:
 ```env
 USE_SQLITE=false
 DATABASE_URL=postgresql+psycopg2://USER:PASSWORD@HOST/DBNAME
-FIREBASE_MOCK_AUTH=true
+FIREBASE_MOCK_AUTH=false
 USE_MOCK_ML=false
 MODEL_PATH=model/scam_classifier.pkl
 USE_MOCK_URL=true
 DEBUG=false
-CORS_ORIGINS=["https://your-vercel-app.vercel.app"]
+CORS_ORIGINS=https://your-vercel-app.vercel.app
 ```
 
 ### Frontend: Vercel

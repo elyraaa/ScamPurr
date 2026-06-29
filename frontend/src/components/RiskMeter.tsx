@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { cn, getRiskGradient, getRiskEmoji } from '../lib/utils';
+import { cn, getRiskEmoji } from '../lib/utils';
 import type { RiskLabel } from '../types';
 
 
@@ -26,7 +26,6 @@ export function RiskMeter({ score, label, size = 'md', animated = true }: RiskMe
   const arcFraction = (score / 100) * 0.75; // 75% of full circle
   const dashoffset = circumference * (1 - arcFraction);
 
-  const gradient = getRiskGradient(score);
   const gradientId = `risk-gradient-${label}`;
 
   const LABEL_COLORS: Record<RiskLabel, string> = {

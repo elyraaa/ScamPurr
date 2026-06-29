@@ -185,16 +185,4 @@ http://localhost:8000/docs
 ```
 
 ## Deployment
-
-### Frontend on Vercel
-
-Use these settings:
-
-```text
-Root Directory: frontend
-Install Command: npm install
-Build Command: npm run build
-Output Directory: dist
-```
-
-Set production frontend environment variables in Vercel.
+https://scam-purr.vercel.app/

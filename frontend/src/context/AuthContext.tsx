@@ -43,25 +43,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     let unsubscribe: (() => void) | undefined;
     import('firebase/auth').then(({ onAuthStateChanged }) => {
-      unsubscribe = onAuthStateChanged(auth!, async (firebaseUser: any) => {
+      unsubscribe = onAuthStateChanged(auth!, async (firebaseUser) => {
+        console.log("========== AUTH STATE ==========");
+        console.log("Firebase User:", firebaseUser);
+
         if (firebaseUser) {
           try {
+            console.log("Getting Firebase ID Token...");
+
             const idToken = await firebaseUser.getIdToken();
+
+            console.log("ID Token:", idToken.substring(0, 40) + "...");
+
             setToken(idToken);
             setAuthToken(idToken);
+
+            console.log("Calling backend /auth/verify...");
+
             const dbUser = await verifyWithBackend(idToken);
+
+            console.log("Backend User:", dbUser);
+
             setUser(dbUser);
+
           } catch (e) {
-            console.error('Auth error:', e);
+            console.error("AUTH FLOW ERROR:", e);
+
             setUser(null);
             setToken(null);
             setAuthToken(null);
           }
         } else {
+          console.log("No Firebase user");
+
           setUser(null);
           setToken(null);
           setAuthToken(null);
         }
+
         setLoading(false);
       });
     });
@@ -74,11 +93,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await demoLogin();
       return;
     }
-    if (!auth) return;
-    const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
+
+    if (!auth) {
+      console.error("Firebase Auth is null");
+      return;
+    }
+
+    const { GoogleAuthProvider, signInWithPopup } = await import("firebase/auth");
+
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-    // Auth state change handled by onAuthStateChanged above
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+
+      console.log("Google Sign-In Success:", result.user);
+
+    } catch (error) {
+      console.error("Google Sign-In Error:", error);
+      throw error;
+    }
   };
 
   const demoLogin = async () => {

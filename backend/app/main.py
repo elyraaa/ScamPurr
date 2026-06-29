@@ -13,19 +13,21 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup: create DB tables. Shutdown: nothing extra needed."""
-    create_all_tables()
+    """Startup: create DB tables when configured. Shutdown: nothing extra needed."""
+    if settings.AUTO_CREATE_TABLES:
+        create_all_tables()
     yield
 
 
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="🐱 AI-powered cat adoption scam detection platform",
+    description="AI-powered cat adoption scam detection platform",
     docs_url="/docs",
     redoc_url="/redoc",
     lifespan=lifespan,
 )
+
 
 def _parse_cors_origins(value: str) -> list[str]:
     """Accept comma-separated or JSON-list CORS origin formats."""

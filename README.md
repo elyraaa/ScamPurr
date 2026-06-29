@@ -14,6 +14,9 @@ ScamPurr AI analyzes cat adoption listing text and shelter/listing URLs, then re
 - Explainable risk factors and labels
 - User dashboard
 - Analysis history
+- Basic request rate limiting
+- Listing text and URL input size validation
+- Privacy notice page
 - PostgreSQL support for production
 - SQLite support for local development
 - Trained scikit-learn model support
@@ -45,6 +48,7 @@ ScamPurr AI analyzes cat adoption listing text and shelter/listing URLs, then re
 - Alembic
 - Uvicorn
 - Firebase Admin SDK
+- In-memory API rate limiting
 
 **Machine Learning**
 
@@ -122,6 +126,25 @@ Local URLs:
 
 Stop both servers with `Ctrl+C`.
 
+## Local Validation
+
+Run backend schema tests:
+
+```powershell
+cd backend
+.\.venv\Scripts\python.exe -m unittest discover -s tests
+cd ..
+```
+
+Run frontend checks:
+
+```powershell
+cd frontend
+npm run lint
+npm run build
+cd ..
+```
+
 ## Local Demo Flow
 
 1. Open http://localhost:5173
@@ -185,4 +208,19 @@ http://localhost:8000/docs
 ```
 
 ## Deployment
-https://scam-purr.vercel.app/
+
+- Frontend: https://scam-purr.vercel.app/
+- Backend health: use the Render `/health` endpoint
+- Operations notes: `docs/OPERATIONS.md`
+
+## Production Settings
+
+Recommended production values:
+
+- `VITE_DEMO_MODE=false`
+- `FIREBASE_MOCK_AUTH=false`
+- `USE_SQLITE=false`
+- `CORS_ORIGINS=https://scam-purr.vercel.app`
+- `AUTO_CREATE_TABLES=true` until Alembic migrations are finalized
+- `RATE_LIMIT_AUTH_PER_MINUTE=20`
+- `RATE_LIMIT_ANALYSIS_PER_MINUTE=10`

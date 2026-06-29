@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Cat, Loader2, Shield, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -139,7 +139,10 @@ export function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-slate-600 mt-6">
-          ScamPurr AI • Coding.Kitty Hackathon 2026
+          ScamPurr AI | Coding.Kitty Hackathon 2026 |{' '}
+          <Link to="/privacy" className="hover:text-slate-400 transition-colors">
+            Privacy
+          </Link>
         </p>
       </motion.div>
     </div>

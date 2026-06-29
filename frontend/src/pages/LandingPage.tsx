@@ -172,7 +172,10 @@ export function LandingPage() {
 
       {/* Footer */}
       <footer className="relative z-10 text-center py-8 text-slate-600 text-sm border-t border-white/5">
-        ScamPurr AI • Coding.Kitty Hackathon 2026 • Built with 🐾 and TypeScript
+        ScamPurr AI | Coding.Kitty Hackathon 2026 | Built with TypeScript |{' '}
+        <Link to="/privacy" className="hover:text-slate-400 transition-colors">
+          Privacy
+        </Link>
       </footer>
     </div>
   );

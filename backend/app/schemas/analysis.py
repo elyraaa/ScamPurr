@@ -4,6 +4,11 @@ from datetime import datetime
 from app.models.analysis import AnalysisType
 
 
+MIN_LISTING_TEXT_CHARS = 20
+MAX_LISTING_TEXT_CHARS = 5000
+MAX_URL_CHARS = 2048
+
+
 class ListingAnalysisRequest(BaseModel):
     text: str
     url: Optional[str] = None  # Optional URL to also analyze
@@ -11,16 +16,24 @@ class ListingAnalysisRequest(BaseModel):
     @field_validator("text")
     @classmethod
     def text_must_not_be_empty(cls, v: str) -> str:
-        if not v or len(v.strip()) < 20:
-            raise ValueError("Listing text must be at least 20 characters")
-        return v.strip()
+        text = v.strip() if v else ""
+        if len(text) < MIN_LISTING_TEXT_CHARS:
+            raise ValueError(f"Listing text must be at least {MIN_LISTING_TEXT_CHARS} characters")
+        if len(text) > MAX_LISTING_TEXT_CHARS:
+            raise ValueError(f"Listing text must be {MAX_LISTING_TEXT_CHARS} characters or fewer")
+        return text
 
     @field_validator("url")
     @classmethod
     def url_format_check(cls, v: Optional[str]) -> Optional[str]:
-        if v and not v.startswith(("http://", "https://")):
+        if not v:
+            return v
+        url = v.strip()
+        if len(url) > MAX_URL_CHARS:
+            raise ValueError(f"URL must be {MAX_URL_CHARS} characters or fewer")
+        if not url.startswith(("http://", "https://")):
             raise ValueError("URL must start with http:// or https://")
-        return v
+        return url
 
 
 class UrlAnalysisRequest(BaseModel):
@@ -29,9 +42,12 @@ class UrlAnalysisRequest(BaseModel):
     @field_validator("url")
     @classmethod
     def url_must_be_valid(cls, v: str) -> str:
-        if not v.startswith(("http://", "https://")):
+        url = v.strip() if v else ""
+        if len(url) > MAX_URL_CHARS:
+            raise ValueError(f"URL must be {MAX_URL_CHARS} characters or fewer")
+        if not url.startswith(("http://", "https://")):
             raise ValueError("URL must start with http:// or https://")
-        return v.strip()
+        return url
 
 
 class AnalysisResponse(BaseModel):

@@ -8,6 +8,7 @@ from app.database import get_db
 from app.deps import get_current_user
 from app.models.user import User
 from app.models.analysis import Analysis, AnalysisType
+from app.rate_limit import analysis_rate_limit
 from app.schemas.analysis import ListingAnalysisRequest, UrlAnalysisRequest
 from app.schemas.risk_score import FullAnalysisResponse, HistoryItemResponse, RiskScoreResponse, ExplanationResponse
 from app.services.ml_service import analyze_listing
@@ -51,7 +52,7 @@ def _build_full_response(analysis: Analysis) -> FullAnalysisResponse:
     )
 
 
-@router.post("/listing", response_model=FullAnalysisResponse)
+@router.post("/listing", response_model=FullAnalysisResponse, dependencies=[Depends(analysis_rate_limit)])
 async def analyze_listing_text(
     body: ListingAnalysisRequest,
     db: Session = Depends(get_db),
@@ -94,7 +95,7 @@ async def analyze_listing_text(
         )
 
 
-@router.post("/url", response_model=FullAnalysisResponse)
+@router.post("/url", response_model=FullAnalysisResponse, dependencies=[Depends(analysis_rate_limit)])
 async def analyze_shelter_url(
     body: UrlAnalysisRequest,
     db: Session = Depends(get_db),

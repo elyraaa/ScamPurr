@@ -5,31 +5,34 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    # ── Database ──────────────────────────────────
+    # Database
     DATABASE_URL: str = "sqlite:///./scampurr.db"
     USE_SQLITE: bool = True
+    AUTO_CREATE_TABLES: bool = True
 
-    # ── Firebase ──────────────────────────────────
+    # Firebase
     FIREBASE_PROJECT_ID: Optional[str] = None
     FIREBASE_CREDENTIALS_PATH: Optional[str] = None
     FIREBASE_SERVICE_ACCOUNT_JSON: Optional[str] = None
     FIREBASE_MOCK_AUTH: bool = False
 
-    # ── External APIs ─────────────────────────────
+    # External APIs
     GOOGLE_SAFE_BROWSING_API_KEY: Optional[str] = None
     VIRUSTOTAL_API_KEY: Optional[str] = None
 
-    # ── ML Service ────────────────────────────────
+    # ML Service
     USE_MOCK_ML: bool = True
     MODEL_PATH: str = "model/scam_classifier.pkl"
 
-    # ── URL Service ───────────────────────────────
+    # URL Service
     USE_MOCK_URL: bool = True
 
-    # ── App ───────────────────────────────────────
+    # App
     APP_NAME: str = "ScamPurr AI"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
+    RATE_LIMIT_AUTH_PER_MINUTE: int = 20
+    RATE_LIMIT_ANALYSIS_PER_MINUTE: int = 10
 
     # Comma-separated origins
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"

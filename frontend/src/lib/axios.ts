@@ -9,7 +9,7 @@ export const api = axios.create({
   },
 });
 
-// Token getter — injected by AuthContext on login
+// Token getter injected by AuthContext on login
 let _authToken: string | null = null;
 
 export const setAuthToken = (token: string | null) => {
@@ -31,6 +31,18 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (!error.response) {
+      return Promise.reject(
+        new Error(
+          'The ScamPurr API is not responding yet. The backend may be waking up, so please wait a few seconds and try again.'
+        )
+      );
+    }
+
+    if (error.response.status === 429) {
+      return Promise.reject(new Error('Too many requests. Please wait a minute and try again.'));
+    }
+
     const message =
       error.response?.data?.detail ||
       error.response?.data?.message ||

@@ -9,6 +9,7 @@ import { ListingAnalysisPage } from './pages/ListingAnalysisPage';
 import { UrlAnalysisPage } from './pages/UrlAnalysisPage';
 import { ResultPage } from './pages/ResultPage';
 import { HistoryPage } from './pages/HistoryPage';
+import { PrivacyPage } from './pages/PrivacyPage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           {/* Public */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
 
           {/* Protected */}
           <Route

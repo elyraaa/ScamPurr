@@ -4,13 +4,14 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.user import User
+from app.rate_limit import auth_rate_limit
 from app.schemas.user import TokenVerifyRequest, AuthResponse, UserResponse
 from app.services.firebase_auth import verify_firebase_token
 
 router = APIRouter()
 
 
-@router.post("/verify", response_model=AuthResponse)
+@router.post("/verify", response_model=AuthResponse, dependencies=[Depends(auth_rate_limit)])
 async def verify_and_upsert_user(
     body: TokenVerifyRequest,
     db: Session = Depends(get_db),

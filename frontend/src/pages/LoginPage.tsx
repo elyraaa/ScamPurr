@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Cat, Loader2, Shield, Zap } from 'lucide-react';
+import { Cat, Loader2, Mail, Shield, Zap } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 import { getErrorMessage } from '../lib/errors';
-import { DEMO_MODE } from '../lib/firebase';
+import { LOCAL_AUTH } from '../lib/firebase';
 
 export function LoginPage() {
-  const { user, loading, login, demoLogin } = useAuth();
+  const { user, loading, login, loginWithEmail, registerWithEmail } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [isDemoLoading, setIsDemoLoading] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   if (!loading && user) {
@@ -30,16 +32,21 @@ export function LoginPage() {
     }
   };
 
-  const handleDemoLogin = async () => {
-    setIsDemoLoading(true);
+  const handleEmailAuth = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsLoading(true);
     setError(null);
     try {
-      await demoLogin();
+      if (isRegistering) {
+        await registerWithEmail(email, password);
+      } else {
+        await loginWithEmail(email, password);
+      }
       navigate('/dashboard');
     } catch (error) {
-      setError(getErrorMessage(error, 'Demo login failed.'));
+      setError(getErrorMessage(error, isRegistering ? 'Account creation failed.' : 'Sign-in failed.'));
     } finally {
-      setIsDemoLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -73,11 +80,59 @@ export function LoginPage() {
 
           {/* Auth buttons */}
           <div className="space-y-3">
+            <form onSubmit={handleEmailAuth} className="space-y-3">
+              <input
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                type="email"
+                required
+                placeholder="Email address"
+                className="input-dark w-full rounded-xl px-4 py-3.5 text-sm"
+              />
+              <input
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                type="password"
+                required
+                minLength={6}
+                placeholder="Password"
+                className="input-dark w-full rounded-xl px-4 py-3.5 text-sm"
+              />
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full flex items-center justify-center gap-3 btn-primary px-5 py-3.5 rounded-xl text-white font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Mail className="w-5 h-5" />
+                )}
+                {isRegistering ? 'Create account' : 'Sign in with email'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsRegistering((value) => !value)}
+                className="w-full text-xs text-[#a55275] hover:text-[#7e2f51] transition-colors"
+              >
+                {isRegistering ? 'Already have an account? Sign in' : 'Need an account? Create one'}
+              </button>
+            </form>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/8" />
+              </div>
+              <div className="relative flex justify-center text-xs text-slate-500">
+                <span className="bg-[#fff9fc] px-3">or</span>
+              </div>
+            </div>
+
             {/* Google */}
             <button
               id="btn-google-login"
               onClick={handleGoogleLogin}
-              disabled={isLoading || isDemoLoading}
+              disabled={isLoading || LOCAL_AUTH}
               className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl border border-white/12 bg-white/5 hover:bg-white/10 text-white font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
             >
               {isLoading ? (
@@ -93,32 +148,10 @@ export function LoginPage() {
               Continue with Google
             </button>
 
-            {DEMO_MODE && (
-              <>
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-white/8" />
-                  </div>
-                  <div className="relative flex justify-center text-xs text-slate-500">
-                    <span className="bg-[#fff9fc] px-3">or</span>
-                  </div>
-                </div>
-
-                {/* Demo mode */}
-                <button
-                  id="btn-demo-login"
-                  onClick={handleDemoLogin}
-                  disabled={isLoading || isDemoLoading}
-                  className="w-full flex items-center justify-center gap-3 btn-primary px-5 py-3.5 rounded-xl text-white font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isDemoLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <Cat className="w-5 h-5" />
-                  )}
-                  Try Demo Mode - no sign up
-                </button>
-              </>
+            {LOCAL_AUTH && (
+              <p className="rounded-xl border border-violet-500/20 bg-violet-500/10 px-4 py-3 text-xs leading-relaxed text-violet-200">
+                Local auth is enabled. Use any placeholder email and password to test account flows.
+              </p>
             )}
           </div>
 

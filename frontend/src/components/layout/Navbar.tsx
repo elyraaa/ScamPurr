@@ -26,7 +26,7 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 h-16 border-b-[3px] border-[#f4a0c0] bg-[#fff9fc]/95">
       <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
         {/* Logo */}
-        <Link to="/dashboard" className="flex items-center gap-2.5 group">
+        <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-2.5 group">
           <div className="w-8 h-8 rounded-xl border-[3px] border-[#7e2f51] bg-[#ffd6e8] flex items-center justify-center shadow-[3px_3px_0_rgba(126,47,81,0.22)] group-hover:bg-[#f9d0e0] transition-colors">
             <Cat className="w-4 h-4 text-[#d4537e]" />
           </div>
@@ -38,7 +38,7 @@ export function Navbar() {
 
         {/* Nav links */}
         <div className="hidden md:flex items-center gap-1">
-          {NAV_LINKS.map(({ to, label, icon: Icon }) => {
+          {NAV_LINKS.filter(({ to }) => user || !['/dashboard', '/history'].includes(to)).map(({ to, label, icon: Icon }) => {
             const active = location.pathname === to;
             return (
               <Link
@@ -83,13 +83,22 @@ export function Navbar() {
               </span>
             </div>
           )}
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-[#a55275] hover:text-[#c93f69] hover:bg-[#ffd6e8] transition-all duration-200 border border-transparent hover:border-[#f4a0c0]"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Sign out</span>
-          </button>
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-[#a55275] hover:text-[#c93f69] hover:bg-[#ffd6e8] transition-all duration-200 border border-transparent hover:border-[#f4a0c0]"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Sign out</span>
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-[#a55275] hover:text-[#7e2f51] hover:bg-[#ffd6e8] transition-all duration-200 border border-transparent hover:border-[#f4a0c0]"
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       </div>
     </nav>

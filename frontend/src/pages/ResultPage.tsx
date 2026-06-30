@@ -19,6 +19,15 @@ export function ResultPage() {
 
   useEffect(() => {
     if (!id) return;
+    const guestResult = sessionStorage.getItem(`scampurr_guest_result_${id}`);
+    if (guestResult) {
+      Promise.resolve().then(() => {
+        setData(JSON.parse(guestResult));
+        setLoading(false);
+      });
+      return;
+    }
+
     api.get<FullAnalysisResponse>(`/analyses/${id}`)
       .then(res => setData(res.data))
       .catch(e => setError(e.message))

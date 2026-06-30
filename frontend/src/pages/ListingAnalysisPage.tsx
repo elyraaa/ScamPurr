@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, AlertCircle, Globe, Info } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
 import { ScanningCatLoader } from '../components/pixel';
+import { useAuth } from '../context/useAuth';
 import { api } from '../lib/axios';
 import { getErrorMessage } from '../lib/errors';
 import type { FullAnalysisResponse } from '../types';
@@ -31,6 +32,7 @@ const SAMPLE_TEXTS = [
 
 export function ListingAnalysisPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,7 +48,11 @@ export function ListingAnalysisPage() {
     try {
       const payload: { text: string; url?: string } = { text: data.text };
       if (data.url) payload.url = data.url;
-      const res = await api.post<FullAnalysisResponse>('/analyses/listing', payload);
+      const endpoint = user ? '/analyses/listing' : '/analyses/guest/listing';
+      const res = await api.post<FullAnalysisResponse>(endpoint, payload);
+      if (!user) {
+        sessionStorage.setItem(`scampurr_guest_result_${res.data.analysis_id}`, JSON.stringify(res.data));
+      }
       navigate(`/result/${res.data.analysis_id}`);
     } catch (error) {
       setError(getErrorMessage(error, 'Analysis failed. Please try again.'));

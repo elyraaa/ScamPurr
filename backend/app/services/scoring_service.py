@@ -17,11 +17,13 @@ Risk Labels:
 """
 import uuid
 import logging
+from datetime import datetime, timezone
 from typing import Optional
 from sqlalchemy.orm import Session
 
 from app.models.analysis import Analysis, AnalysisType
 from app.models.risk_score import RiskScore, Explanation, RiskLabel
+from app.schemas.risk_score import RiskScoreResponse, ExplanationResponse
 from app.services.ml_service import MLResult, MLFactor
 from app.services.url_service import URLResult, URLFactor
 
@@ -69,6 +71,66 @@ def _url_factor_to_explanation(
         is_red_flag=factor.is_red_flag,
         category=factor.category,
         order=order,
+    )
+
+
+def build_score_response(
+    analysis_id: str,
+    ml_result: Optional[MLResult] = None,
+    url_result: Optional[URLResult] = None,
+) -> RiskScoreResponse:
+    """Build a non-persisted risk score response for guest analyses."""
+    listing_score: Optional[float] = ml_result.score if ml_result else None
+    url_score: Optional[float] = url_result.score if url_result else None
+
+    if listing_score is not None and url_score is not None:
+        combined = LISTING_WEIGHT * listing_score + URL_WEIGHT * url_score
+    elif listing_score is not None:
+        combined = listing_score
+    else:
+        combined = url_score or 0.0
+
+    combined = round(combined, 2)
+    label = _score_to_label(combined)
+    risk_score_id = str(uuid.uuid4())
+    explanations: list[ExplanationResponse] = []
+    order = 0
+
+    if ml_result:
+        for factor in ml_result.factors:
+            explanations.append(ExplanationResponse(
+                id=str(uuid.uuid4()),
+                factor=factor.factor,
+                weight=round(factor.weight, 4),
+                description=factor.description,
+                is_red_flag=factor.is_red_flag,
+                category=factor.category,
+                order=order,
+            ))
+            order += 1
+
+    if url_result:
+        for factor in url_result.factors:
+            explanations.append(ExplanationResponse(
+                id=str(uuid.uuid4()),
+                factor=factor.factor,
+                weight=round(factor.weight, 4),
+                description=factor.description,
+                is_red_flag=factor.is_red_flag,
+                category=factor.category,
+                order=order,
+            ))
+            order += 1
+
+    return RiskScoreResponse(
+        id=risk_score_id,
+        analysis_id=analysis_id,
+        listing_score=listing_score,
+        url_score=url_score,
+        combined_score=combined,
+        risk_label=label,
+        explanations=explanations,
+        created_at=datetime.now(timezone.utc),
     )
 
 

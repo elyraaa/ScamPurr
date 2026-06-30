@@ -32,27 +32,15 @@ function App() {
           />
           <Route
             path="/analyze/listing"
-            element={
-              <ProtectedRoute>
-                <ListingAnalysisPage />
-              </ProtectedRoute>
-            }
+            element={<ListingAnalysisPage />}
           />
           <Route
             path="/analyze/url"
-            element={
-              <ProtectedRoute>
-                <UrlAnalysisPage />
-              </ProtectedRoute>
-            }
+            element={<UrlAnalysisPage />}
           />
           <Route
             path="/result/:id"
-            element={
-              <ProtectedRoute>
-                <ResultPage />
-              </ProtectedRoute>
-            }
+            element={<ResultPage />}
           />
           <Route
             path="/history"

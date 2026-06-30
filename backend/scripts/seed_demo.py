@@ -1,7 +1,7 @@
 """
-Seed Demo Data for ScamPurr AI
--------------------------------
-Creates 3 demo analyses (LOW, MEDIUM, HIGH risk) for a demo user.
+Seed Sample Data for ScamPurr AI
+---------------------------------
+Creates 3 sample analyses (LOW, MEDIUM, HIGH risk) for a local user.
 Useful for showcasing the platform without manual input.
 
 Usage:
@@ -26,10 +26,10 @@ from app.models.analysis import Analysis, AnalysisType
 from app.models.risk_score import RiskScore, Explanation, RiskLabel
 
 DEMO_USER = {
-    "id": "demo-user-seed-001",
-    "firebase_uid": "demo-user-1",
-    "email": "demo@scampurr.ai",
-    "display_name": "Demo Cat Detective",
+    "id": "local-user-seed-001",
+    "firebase_uid": "local:tester@local.scampurr.ai",
+    "email": "tester@local.scampurr.ai",
+    "display_name": "Local Cat Detective",
     "photo_url": None,
 }
 

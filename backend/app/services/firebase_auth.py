@@ -2,9 +2,7 @@
 Firebase Authentication Service
 --------------------------------
 Supports two modes:
-  - MOCK MODE  (FIREBASE_MOCK_AUTH=true):  accepts any token, returns decoded payload
-                                            using the token string itself as the UID.
-                                            Perfect for local development without Firebase.
+  - LOCAL MODE (FIREBASE_MOCK_AUTH=true): accepts local development tokens.
   - REAL MODE  (FIREBASE_MOCK_AUTH=false): verifies against Firebase Admin SDK.
 """
 import logging
@@ -64,10 +62,14 @@ async def verify_firebase_token(id_token: str) -> Optional[Dict[str, Any]]:
     """
     # ── Mock Mode ─────────────────────────────────────────────────────
     if settings.FIREBASE_MOCK_AUTH:
+        normalized = id_token.strip()
+        email = normalized.removeprefix("local:").strip().lower()
+        if "@" not in email:
+            email = f"{normalized.replace(' ', '_')}@local.scampurr.ai"
         return {
-            "uid": id_token,
-            "email": f"{id_token.replace(' ', '_')}@demo.scampurr.ai",
-            "name": "Demo User",
+            "uid": normalized,
+            "email": email,
+            "name": email.split("@", 1)[0],
             "picture": None,
         }
 

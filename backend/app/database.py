@@ -48,6 +48,6 @@ def get_db():
 
 def create_all_tables():
     """Create all tables from ORM models. Called at startup."""
-    from app.models import user, analysis, risk_score  # noqa: F401
+    from app.models import user, analysis, risk_score, app_metric  # noqa: F401
 
     Base.metadata.create_all(bind=engine)

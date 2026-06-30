@@ -6,14 +6,15 @@ ScamPurr AI analyzes cat adoption listing text and shelter/listing URLs, then re
 
 ## Features
 
-- Firebase Google Authentication for production sign-in
-- Demo authentication mode for local development
+- Firebase authentication for production sign-in
+- Local placeholder email authentication for development
+- Guest listing and URL checks without saved user history
 - Adoption listing scam analysis
 - Shelter/listing URL trust analysis
 - Combined listing + URL risk scoring
 - Explainable risk factors and labels
-- User dashboard
-- Analysis history
+- User dashboard and saved analysis history
+- Public aggregate URL check counter
 - Basic request rate limiting
 - Listing text and URL input size validation
 - Privacy notice page
@@ -41,7 +42,7 @@ ScamPurr AI analyzes cat adoption listing text and shelter/listing URLs, then re
 **Backend**
 
 - FastAPI
-- Python 3.11/3.12
+- Python 3.11 or 3.12
 - Pydantic v2
 - Pydantic Settings
 - SQLAlchemy
@@ -96,7 +97,6 @@ cd backend
 py -3.11 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 Copy-Item .env.example .env
-.\.venv\Scripts\python.exe scripts\seed_demo.py
 .\.venv\Scripts\python.exe scripts\train_model.py
 cd ..
 ```
@@ -112,7 +112,7 @@ cd ..
 
 ## Running Locally
 
-Run both backend and frontend with one command:
+Run both backend and frontend with one command from the project root:
 
 ```powershell
 .\backend\.venv\Scripts\python.exe server.py
@@ -125,6 +125,14 @@ Local URLs:
 - API docs: http://localhost:8000/docs
 
 Stop both servers with `Ctrl+C`.
+
+## Local Flow
+
+1. Open http://localhost:5173
+2. Use any placeholder email and password on the login page.
+3. Run a listing analysis or URL analysis.
+4. Open the result page to review the score and explanations.
+5. Log in to save history, or use the analysis pages while logged out for unsaved guest checks.
 
 ## Local Validation
 
@@ -144,16 +152,6 @@ npm run lint
 npm run build
 cd ..
 ```
-
-## Local Demo Flow
-
-1. Open http://localhost:5173
-2. Use demo mode on the login page.
-3. Go to the dashboard.
-4. Run a listing analysis.
-5. Run a URL analysis.
-6. Open a result page to review the risk score and explanations.
-7. Open history to confirm saved analyses.
 
 ## Model Training
 
@@ -190,25 +188,16 @@ The trained model is saved to:
 backend/model/scam_classifier.pkl
 ```
 
-## API Endpoints
-
-| Method | Endpoint | Auth | Description |
-| --- | --- | --- | --- |
-| `GET` | `/health` | No | Health check |
-| `POST` | `/auth/verify` | No | Verify Firebase token and create/update user |
-| `POST` | `/analyses/listing` | Yes | Analyze listing text |
-| `POST` | `/analyses/url` | Yes | Analyze URL |
-| `GET` | `/analyses/history` | Yes | Get current user's analysis history |
-| `GET` | `/analyses/{id}` | Yes | Get one analysis result |
-
-Interactive docs are available locally at:
-
-```text
-http://localhost:8000/docs
-```
-
 ## Deployment
 
-- Frontend: https://scam-purr.vercel.app/
-- Backend health:https://scampurr.onrender.com/health
+Frontend:
 
+```text
+https://scam-purr.vercel.app/
+```
+
+Backend health:
+
+```text
+https://scampurr.onrender.com/health
+```

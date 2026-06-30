@@ -4,12 +4,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, AlertCircle, Info, Shield, ExternalLink } from 'lucide-react';
+import { Globe, AlertCircle, Shield, ExternalLink } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
 import { ScanningCatLoader } from '../components/pixel';
+import { useAuth } from '../context/useAuth';
 import { api } from '../lib/axios';
 import { getErrorMessage } from '../lib/errors';
-import { DEMO_MODE } from '../lib/firebase';
 import type { FullAnalysisResponse } from '../types';
 
 const schema = z.object({
@@ -36,6 +36,7 @@ const CHECKS = [
 
 export function UrlAnalysisPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,7 +48,11 @@ export function UrlAnalysisPage() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await api.post<FullAnalysisResponse>('/analyses/url', { url: data.url });
+      const endpoint = user ? '/analyses/url' : '/analyses/guest/url';
+      const res = await api.post<FullAnalysisResponse>(endpoint, { url: data.url });
+      if (!user) {
+        sessionStorage.setItem(`scampurr_guest_result_${res.data.analysis_id}`, JSON.stringify(res.data));
+      }
       navigate(`/result/${res.data.analysis_id}`);
     } catch (error) {
       setError(getErrorMessage(error, 'URL analysis failed. Please try again.'));
@@ -137,17 +142,6 @@ export function UrlAnalysisPage() {
                 </p>
               )}
             </div>
-
-            {/* Info */}
-            {DEMO_MODE && (
-              <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-teal-500/8 border border-teal-500/20 text-sm text-teal-300">
-                <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <span>
-                  Running in <strong>demo mode</strong>. Real WHOIS, SSL, Safe Browsing, and VirusTotal
-                  checks depend on the backend configuration.
-                </span>
-              </div>
-            )}
 
             {/* Error */}
             <AnimatePresence>

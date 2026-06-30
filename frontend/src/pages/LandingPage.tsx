@@ -2,7 +2,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Cat, ChevronRight, Eye, Shield, Star, Zap } from 'lucide-react';
 import { CatTreeScene } from '../components/pixel';
-import { DEMO_MODE } from '../lib/firebase';
 
 const FEATURES = [
   {
@@ -80,15 +79,6 @@ export function LandingPage() {
               Start scanning
               <ChevronRight className="w-4 h-4" />
             </button>
-            {DEMO_MODE && (
-              <Link
-                to="/login"
-                className="flex items-center justify-center gap-2 text-[#a55275] hover:text-[#7e2f51] text-xs px-4 py-3 transition-colors"
-              >
-                <Cat className="w-4 h-4" />
-                Try demo mode
-              </Link>
-            )}
           </div>
         </motion.div>
 

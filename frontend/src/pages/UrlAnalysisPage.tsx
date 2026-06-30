@@ -9,6 +9,7 @@ import { Navbar } from '../components/layout/Navbar';
 import { ScanningCatLoader } from '../components/pixel';
 import { api } from '../lib/axios';
 import { getErrorMessage } from '../lib/errors';
+import { DEMO_MODE } from '../lib/firebase';
 import type { FullAnalysisResponse } from '../types';
 
 const schema = z.object({
@@ -138,13 +139,15 @@ export function UrlAnalysisPage() {
             </div>
 
             {/* Info */}
-            <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-teal-500/8 border border-teal-500/20 text-sm text-teal-300">
-              <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
-              <span>
-                Running in <strong>mock mode</strong> by default. Real WHOIS, SSL, Safe Browsing, and VirusTotal
-                checks activate when API keys are configured in the backend.
-              </span>
-            </div>
+            {DEMO_MODE && (
+              <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-teal-500/8 border border-teal-500/20 text-sm text-teal-300">
+                <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <span>
+                  Running in <strong>demo mode</strong>. Real WHOIS, SSL, Safe Browsing, and VirusTotal
+                  checks depend on the backend configuration.
+                </span>
+              </div>
+            )}
 
             {/* Error */}
             <AnimatePresence>

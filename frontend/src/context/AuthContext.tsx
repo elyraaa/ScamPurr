@@ -46,8 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setAuthToken(idToken);
             const dbUser = await verifyWithBackend(idToken);
             setUser(dbUser);
-          } catch (e) {
-            console.error('Auth error:', e);
+          } catch {
             setUser(null);
             setToken(null);
             setAuthToken(null);
@@ -77,6 +76,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const demoLogin = async () => {
+    if (!DEMO_MODE) {
+      throw new Error('Demo mode is disabled in production.');
+    }
+
     const demoToken = DEMO_TOKEN;
     setToken(demoToken);
     setAuthToken(demoToken);

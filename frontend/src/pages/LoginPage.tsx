@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Cat, Loader2, Shield, Zap } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 import { getErrorMessage } from '../lib/errors';
+import { DEMO_MODE } from '../lib/firebase';
 
 export function LoginPage() {
   const { user, loading, login, demoLogin } = useAuth();
@@ -92,29 +93,33 @@ export function LoginPage() {
               Continue with Google
             </button>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/8" />
-              </div>
-              <div className="relative flex justify-center text-xs text-slate-500">
-                <span className="bg-[#fff9fc] px-3">or</span>
-              </div>
-            </div>
+            {DEMO_MODE && (
+              <>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-white/8" />
+                  </div>
+                  <div className="relative flex justify-center text-xs text-slate-500">
+                    <span className="bg-[#fff9fc] px-3">or</span>
+                  </div>
+                </div>
 
-            {/* Demo mode */}
-            <button
-              id="btn-demo-login"
-              onClick={handleDemoLogin}
-              disabled={isLoading || isDemoLoading}
-              className="w-full flex items-center justify-center gap-3 btn-primary px-5 py-3.5 rounded-xl text-white font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isDemoLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <Cat className="w-5 h-5" />
-              )}
-              Try Demo Mode - no sign up
-            </button>
+                {/* Demo mode */}
+                <button
+                  id="btn-demo-login"
+                  onClick={handleDemoLogin}
+                  disabled={isLoading || isDemoLoading}
+                  className="w-full flex items-center justify-center gap-3 btn-primary px-5 py-3.5 rounded-xl text-white font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDemoLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Cat className="w-5 h-5" />
+                  )}
+                  Try Demo Mode - no sign up
+                </button>
+              </>
+            )}
           </div>
 
           {/* Features teaser */}

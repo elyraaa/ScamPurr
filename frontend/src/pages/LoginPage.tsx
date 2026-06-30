@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Cat, Loader2, Mail, Shield, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Cat, Loader2, Mail, Shield, UserPlus, Zap } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 import { getErrorMessage } from '../lib/errors';
 import { LOCAL_AUTH } from '../lib/firebase';
@@ -32,6 +32,10 @@ export function LoginPage() {
     }
   };
 
+  const handleContinueAsGuest = () => {
+    navigate('/analyze/url');
+  };
+
   const handleEmailAuth = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
@@ -60,6 +64,15 @@ export function LoginPage() {
       >
         {/* Card */}
         <div className="glass-card rounded-3xl p-10">
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="mb-6 inline-flex items-center gap-2 text-xs font-semibold text-[#a55275] transition-colors hover:text-[#7e2f51]"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to home
+          </button>
+
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl border-[3px] border-[#7e2f51] bg-[#ffd6e8] shadow-[5px_5px_0_rgba(126,47,81,0.22)] mb-5">
@@ -113,8 +126,10 @@ export function LoginPage() {
               <button
                 type="button"
                 onClick={() => setIsRegistering((value) => !value)}
-                className="w-full text-xs text-[#a55275] hover:text-[#7e2f51] transition-colors"
+                disabled={isLoading}
+                className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#f4a0c0] bg-[#fff9fc] px-5 py-3 text-xs font-semibold text-[#a55275] transition-all hover:bg-[#ffe5f0] hover:text-[#7e2f51] disabled:cursor-not-allowed disabled:opacity-50"
               >
+                <UserPlus className="h-4 w-4" />
                 {isRegistering ? 'Already have an account? Sign in' : 'Need an account? Create one'}
               </button>
             </form>
@@ -146,6 +161,16 @@ export function LoginPage() {
                 </svg>
               )}
               Continue with Google
+            </button>
+
+            <button
+              id="btn-continue-guest"
+              type="button"
+              onClick={handleContinueAsGuest}
+              className="w-full flex items-center justify-center gap-3 rounded-xl border border-white/12 bg-white/5 px-5 py-3.5 text-white font-medium transition-all duration-200 hover:bg-white/10"
+            >
+              <ArrowRight className="w-5 h-5" />
+              Continue as guest
             </button>
 
             {LOCAL_AUTH && (

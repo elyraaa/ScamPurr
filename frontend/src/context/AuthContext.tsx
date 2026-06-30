@@ -116,6 +116,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(result.user);
   };
 
+  const resetPassword = async (email: string) => {
+    if (LOCAL_AUTH) return;
+    if (!auth) return;
+    const { sendPasswordResetEmail } = await import('firebase/auth');
+    await sendPasswordResetEmail(auth, email);
+  };
+
   const logout = async () => {
     if (!LOCAL_AUTH && auth) {
       const { signOut } = await import('firebase/auth');
@@ -128,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, token, login, loginWithEmail, registerWithEmail, logout }}>
+    <AuthContext.Provider value={{ user, loading, token, login, loginWithEmail, registerWithEmail, resetPassword, logout }}>
       {children}
     </AuthContext.Provider>
   );

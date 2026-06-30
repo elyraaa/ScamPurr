@@ -7,9 +7,10 @@ import { getErrorMessage } from '../lib/errors';
 import { LOCAL_AUTH } from '../lib/firebase';
 
 export function LoginPage() {
-  const { user, loading, login, loginWithEmail, registerWithEmail } = useAuth();
+  const { user, loading, login, loginWithEmail, registerWithEmail, resetPassword } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -48,9 +49,32 @@ export function LoginPage() {
       }
       navigate('/dashboard');
     } catch (error) {
-      setError(getErrorMessage(error, isRegistering ? 'Account creation failed.' : 'Sign-in failed.'));
+      const message = getErrorMessage(error, isRegistering ? 'Account creation failed.' : 'Sign-in failed.');
+      if (!isRegistering && message.toLowerCase().includes('invalid-credential')) {
+        setError('This email may use Google sign-in. Try Continue with Google or reset your password.');
+      } else {
+        setError(message);
+      }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!email.trim()) {
+      setError('Enter your email address first, then reset your password.');
+      return;
+    }
+
+    setIsResettingPassword(true);
+    setError(null);
+    try {
+      await resetPassword(email);
+      setError('Password reset email sent. Check your inbox, then sign in again.');
+    } catch (error) {
+      setError(getErrorMessage(error, 'Could not send password reset email. Try Continue with Google.'));
+    } finally {
+      setIsResettingPassword(false);
     }
   };
 
@@ -111,6 +135,16 @@ export function LoginPage() {
                 placeholder="Password"
                 className="input-dark w-full rounded-xl px-4 py-3.5 text-sm"
               />
+              {!isRegistering && (
+                <button
+                  type="button"
+                  onClick={handlePasswordReset}
+                  disabled={isLoading || isResettingPassword || LOCAL_AUTH}
+                  className="w-full text-right text-xs font-semibold text-[#a55275] transition-colors hover:text-[#7e2f51] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isResettingPassword ? 'Sending reset email...' : 'Forgot password?'}
+                </button>
+              )}
               <button
                 type="submit"
                 disabled={isLoading}

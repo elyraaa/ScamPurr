@@ -6,6 +6,7 @@ import type { User } from '../types';
 import { AuthContext } from './authContextValue';
 
 const LOCAL_TOKEN_KEY = 'scampurr_local_token';
+const VERIFY_EMAIL_MESSAGE = 'Check your inbox and verify your email address before signing in.';
 
 function getStoredLocalToken() {
   if (typeof window === 'undefined' || !LOCAL_AUTH) return null;
@@ -95,8 +96,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (!auth) return;
-    const { signInWithEmailAndPassword } = await import('firebase/auth');
+    const { sendEmailVerification, signInWithEmailAndPassword, signOut } = await import('firebase/auth');
     const credential = await signInWithEmailAndPassword(auth, email, password);
+
+    if (!credential.user.emailVerified) {
+      await sendEmailVerification(credential.user);
+      await signOut(auth);
+      setUser(null);
+      setToken(null);
+      setAuthToken(null);
+      throw new Error(`${VERIFY_EMAIL_MESSAGE} We sent a new verification email.`);
+    }
+
     const result = await completeFirebaseAuth(credential.user);
     setToken(result.token);
     setUser(result.user);
@@ -109,11 +120,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (!auth) return;
-    const { createUserWithEmailAndPassword } = await import('firebase/auth');
+    const { createUserWithEmailAndPassword, sendEmailVerification, signOut } = await import('firebase/auth');
     const credential = await createUserWithEmailAndPassword(auth, email, password);
-    const result = await completeFirebaseAuth(credential.user);
-    setToken(result.token);
-    setUser(result.user);
+    await sendEmailVerification(credential.user);
+    await signOut(auth);
+    setUser(null);
+    setToken(null);
+    setAuthToken(null);
+    throw new Error(`${VERIFY_EMAIL_MESSAGE} We sent a verification email to ${email.trim().toLowerCase()}.`);
   };
 
   const resetPassword = async (email: string) => {

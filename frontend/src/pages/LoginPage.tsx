@@ -6,6 +6,8 @@ import { useAuth } from '../context/useAuth';
 import { getErrorMessage } from '../lib/errors';
 import { LOCAL_AUTH } from '../lib/firebase';
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function LoginPage() {
   const { user, loading, login, loginWithEmail, registerWithEmail, resetPassword } = useAuth();
   const navigate = useNavigate();
@@ -39,13 +41,20 @@ export function LoginPage() {
 
   const handleEmailAuth = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const trimmedEmail = email.trim();
+
+    if (!LOCAL_AUTH && !EMAIL_PATTERN.test(trimmedEmail)) {
+      setError('Enter a valid email address.');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     try {
       if (isRegistering) {
-        await registerWithEmail(email, password);
+        await registerWithEmail(trimmedEmail, password);
       } else {
-        await loginWithEmail(email, password);
+        await loginWithEmail(trimmedEmail, password);
       }
       navigate('/dashboard');
     } catch (error) {
@@ -61,15 +70,22 @@ export function LoginPage() {
   };
 
   const handlePasswordReset = async () => {
-    if (!email.trim()) {
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
       setError('Enter your email address first, then reset your password.');
+      return;
+    }
+
+    if (!LOCAL_AUTH && !EMAIL_PATTERN.test(trimmedEmail)) {
+      setError('Enter a valid email address.');
       return;
     }
 
     setIsResettingPassword(true);
     setError(null);
     try {
-      await resetPassword(email);
+      await resetPassword(trimmedEmail);
       setError('Password reset email sent. Check your inbox, then sign in again.');
     } catch (error) {
       setError(getErrorMessage(error, 'Could not send password reset email. Try Continue with Google.'));

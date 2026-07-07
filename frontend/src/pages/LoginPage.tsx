@@ -8,6 +8,16 @@ import { LOCAL_AUTH } from '../lib/firebase';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function getEmailValidationError(email: string): string | null {
+  const normalized = email.trim().toLowerCase();
+
+  if (!EMAIL_PATTERN.test(normalized)) {
+    return 'Enter a valid email address.';
+  }
+
+  return null;
+}
+
 export function LoginPage() {
   const { user, loading, login, loginWithEmail, registerWithEmail, resetPassword } = useAuth();
   const navigate = useNavigate();
@@ -43,8 +53,9 @@ export function LoginPage() {
     event.preventDefault();
     const trimmedEmail = email.trim();
 
-    if (!LOCAL_AUTH && !EMAIL_PATTERN.test(trimmedEmail)) {
-      setError('Enter a valid email address.');
+    const emailError = LOCAL_AUTH ? null : getEmailValidationError(trimmedEmail);
+    if (emailError) {
+      setError(emailError);
       return;
     }
 
@@ -77,8 +88,9 @@ export function LoginPage() {
       return;
     }
 
-    if (!LOCAL_AUTH && !EMAIL_PATTERN.test(trimmedEmail)) {
-      setError('Enter a valid email address.');
+    const emailError = LOCAL_AUTH ? null : getEmailValidationError(trimmedEmail);
+    if (emailError) {
+      setError(emailError);
       return;
     }
 

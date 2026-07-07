@@ -82,6 +82,13 @@ async def verify_firebase_token(id_token: str) -> Optional[Dict[str, Any]]:
         from firebase_admin import auth as firebase_auth
 
         decoded = firebase_auth.verify_id_token(id_token)
+        firebase_claims = decoded.get("firebase", {})
+        sign_in_provider = firebase_claims.get("sign_in_provider")
+
+        if sign_in_provider == "password" and not decoded.get("email_verified"):
+            logger.info("Rejected unverified email/password Firebase token")
+            return None
+
         return decoded
 
     except Exception:

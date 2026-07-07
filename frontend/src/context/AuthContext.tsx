@@ -29,6 +29,13 @@ async function completeFirebaseAuth(firebaseUser: FirebaseUser): Promise<{ user:
   return { user, token: idToken };
 }
 
+function isUnverifiedPasswordUser(firebaseUser: FirebaseUser) {
+  return (
+    !firebaseUser.emailVerified &&
+    firebaseUser.providerData.some((provider) => provider.providerId === 'password')
+  );
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(() => getStoredLocalToken());
@@ -53,10 +60,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!firebaseAuth) return;
 
     let unsubscribe: (() => void) | undefined;
-    import('firebase/auth').then(({ onAuthStateChanged }) => {
+    import('firebase/auth').then(({ onAuthStateChanged, signOut }) => {
       unsubscribe = onAuthStateChanged(firebaseAuth, async (firebaseUser: FirebaseUser | null) => {
         if (firebaseUser) {
           try {
+            if (isUnverifiedPasswordUser(firebaseUser)) {
+              await signOut(firebaseAuth);
+              setUser(null);
+              setToken(null);
+              setAuthToken(null);
+              setLoading(false);
+              return;
+            }
+
             const result = await completeFirebaseAuth(firebaseUser);
             setToken(result.token);
             setUser(result.user);

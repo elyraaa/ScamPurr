@@ -1,7 +1,8 @@
 # #hackthekitty 2026 Project Report
 
 **Project Name:** ScamPurr AI  
-**Reference ID:** 
+**Team Name** Vhronin
+**Reference ID:** 7HZFHVGA
 
 ## 1. Executive Summary
 
@@ -175,8 +176,8 @@ Technically, the biggest takeaways were around production readiness: validating 
 
 ## Submission Checklist
 
-- Video demo: Pending
+- Video demo: Complete
 - README.md with prerequisites, run instructions, and configuration: Complete
 - Project report in `documentation/`: Complete
 - Source code: Present in `frontend/src` and `backend/app`
-- No unrelated package folders such as `node_modules`, `dist`, or virtual environments committed: Verify before final submission
+

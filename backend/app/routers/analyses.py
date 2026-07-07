@@ -90,9 +90,20 @@ async def analyze_listing_text(
     Analyze an adoption listing text for scam signals.
     Optionally include a URL to perform a combined analysis.
     """
+    risk_score = None
     try:
+        analysis_id = str(uuid.uuid4())
+        ml_result = analyze_listing(body.text)
+
+        url_result = None
+        if body.url:
+            url_result = await analyze_url(body.url)
+            _increment_metric(db, URL_CHECKS_TOTAL_KEY)
+
+        risk_score = build_score_response(analysis_id, ml_result, url_result)
+
         analysis = Analysis(
-            id=str(uuid.uuid4()),
+            id=analysis_id,
             user_id=current_user.id,
             type=AnalysisType.LISTING,
             input_text=body.text,
@@ -100,13 +111,6 @@ async def analyze_listing_text(
         )
         db.add(analysis)
         db.commit()
-
-        ml_result = analyze_listing(body.text)
-
-        url_result = None
-        if body.url:
-            url_result = await analyze_url(body.url)
-            _increment_metric(db, URL_CHECKS_TOTAL_KEY)
 
         compute_and_save_score(db, analysis, ml_result, url_result)
         db.refresh(analysis)
@@ -116,10 +120,19 @@ async def analyze_listing_text(
         raise
     except Exception:
         db.rollback()
-        logger.exception("Listing analysis failed")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Unable to complete listing analysis",
+        if risk_score is None:
+            logger.exception("Listing analysis failed before a score could be computed")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Unable to complete listing analysis",
+            )
+
+        logger.exception("Listing history persistence failed; returning unsaved listing result")
+        return _build_guest_response(
+            analysis_type=AnalysisType.LISTING,
+            risk_score=risk_score,
+            input_text=body.text,
+            input_url=body.url,
         )
 
 

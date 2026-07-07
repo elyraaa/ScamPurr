@@ -91,11 +91,10 @@ async def analyze_listing_text(
     Optionally include a URL to perform a combined analysis.
     """
     try:
-        analysis_type = AnalysisType.COMBINED if body.url else AnalysisType.LISTING
         analysis = Analysis(
             id=str(uuid.uuid4()),
             user_id=current_user.id,
-            type=analysis_type,
+            type=AnalysisType.LISTING,
             input_text=body.text,
             input_url=body.url,
         )

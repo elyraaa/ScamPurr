@@ -33,7 +33,7 @@ def ensure_setup() -> None:
     missing: list[str] = []
 
     if not backend_python().exists():
-        missing.append("backend virtual environment: backend/venv")
+        missing.append("backend virtual environment: backend/.venv")
 
     if not (FRONTEND_DIR / "node_modules").exists():
         missing.append("frontend dependencies: frontend/node_modules")
@@ -45,8 +45,8 @@ def ensure_setup() -> None:
         print()
         print("Run these once, then start this file again:")
         print("  cd backend")
-        print("  py -m venv venv")
-        print("  .\\venv\\Scripts\\python.exe -m pip install -r requirements.txt")
+        print("  py -3.11 -m venv .venv")
+        print("  .\\.venv\\Scripts\\python.exe -m pip install -r requirements.txt")
         print("  cd ..\\frontend")
         print("  npm install")
         raise SystemExit(1)

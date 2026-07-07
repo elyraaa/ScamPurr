@@ -1,35 +1,35 @@
 # ScamPurr AI
 
-AI-powered cat adoption scam detection platform built for the Coding.Kitty Hackathon 2026.
+ScamPurr AI is a cat adoption scam detection platform built for the Coding.Kitty Hackathon 2026.
 
-ScamPurr AI analyzes cat adoption listing text and shelter/listing URLs, then returns an explainable scam risk score.
+It analyzes adoption listing text and shelter/listing URLs, then returns an explainable risk score with trust signals and red flags.
 
-## Features
+## Working Features
 
-- Firebase authentication for production sign-in
-- Local placeholder email authentication for development
+- Google sign-in with Firebase Authentication
+- Email/password account creation with email verification
+- Password reset
 - Guest listing and URL checks without saved user history
+- Saved analysis history for signed-in users
 - Adoption listing scam analysis
 - Shelter/listing URL trust analysis
-- Combined listing + URL risk scoring
+- Combined listing and URL scoring
 - Explainable risk factors and labels
-- User dashboard and saved analysis history
+- Cat adoption relevance warnings for unrelated text or URLs
 - Public aggregate URL check counter
-- Basic request rate limiting
-- Listing text and URL input size validation
-- Privacy notice page
-- PostgreSQL support for production
-- SQLite support for local development
-- Trained scikit-learn model support
+- Backend rate limiting
+- Listing text and URL validation
+- PostgreSQL in production and SQLite locally
+- Trainable scikit-learn model
 
 ## Tech Stack
 
 **Frontend**
 
-- React 19
-- TypeScript 6
-- Vite 8
-- Tailwind CSS v4
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
 - React Router
 - TanStack Query
 - React Hook Form
@@ -43,10 +43,9 @@ ScamPurr AI analyzes cat adoption listing text and shelter/listing URLs, then re
 
 - FastAPI
 - Python 3.11 or 3.12
-- Pydantic v2
+- Pydantic
 - Pydantic Settings
 - SQLAlchemy
-- Alembic
 - Uvicorn
 - Firebase Admin SDK
 - In-memory API rate limiting
@@ -61,19 +60,20 @@ ScamPurr AI analyzes cat adoption listing text and shelter/listing URLs, then re
 - NLTK
 - joblib
 
-**Security and URL Analysis**
+**URL Analysis**
 
-- Firebase ID token verification
 - WHOIS checks
 - SSL certificate checks
 - Optional Google Safe Browsing API
 - Optional VirusTotal API
+- Rule-based fallback scoring
 
 **Deployment**
 
 - Frontend: Vercel
 - Backend: Render
 - Database: Neon PostgreSQL
+- Authentication: Firebase
 
 ## Local Installation
 
@@ -83,31 +83,48 @@ ScamPurr AI analyzes cat adoption listing text and shelter/listing URLs, then re
 - Node.js 18 or newer
 - Git
 
-### 1. Clone and open the project
+### 1. Clone And Open The Project
 
 ```powershell
 git clone <repo-url>
 cd scampurr-ai
 ```
 
-### 2. Set up the backend
+### 2. Set Up The Backend
 
 ```powershell
 cd backend
 py -3.11 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-Copy-Item .env.example .env
 .\.venv\Scripts\python.exe scripts\train_model.py
 cd ..
 ```
 
-### 3. Set up the frontend
+Create `backend/.env` if you need local overrides:
+
+```env
+DATABASE_URL=sqlite:///./scampurr.db
+USE_SQLITE=true
+FIREBASE_MOCK_AUTH=true
+USE_MOCK_ML=false
+USE_MOCK_URL=true
+MODEL_PATH=model/scam_classifier.pkl
+CORS_ORIGINS=http://localhost:5173
+```
+
+### 3. Set Up The Frontend
 
 ```powershell
 cd frontend
 npm install
-Copy-Item .env.example .env
 cd ..
+```
+
+Create `frontend/.env` for local development:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000
+VITE_LOCAL_AUTH=true
 ```
 
 ## Running Locally
@@ -129,14 +146,14 @@ Stop both servers with `Ctrl+C`.
 ## Local Flow
 
 1. Open http://localhost:5173
-2. Use any placeholder email and password on the login page.
-3. Run a listing analysis or URL analysis.
+2. Continue as guest, or sign in.
+3. Run a listing analysis, URL analysis, or combined analysis.
 4. Open the result page to review the score and explanations.
-5. Log in to save history, or use the analysis pages while logged out for unsaved guest checks.
+5. Signed-in analyses are saved to history. Guest analyses are not saved to user history.
 
 ## Local Validation
 
-Run backend schema tests:
+Run backend tests:
 
 ```powershell
 cd backend
@@ -174,7 +191,7 @@ Labels:
 - `1` means scam
 - `0` means legitimate
 
-Train or retrain the model:
+Retrain the model:
 
 ```powershell
 cd backend
@@ -188,7 +205,7 @@ The trained model is saved to:
 backend/model/scam_classifier.pkl
 ```
 
-## Deployment
+## Production URLs
 
 Frontend:
 

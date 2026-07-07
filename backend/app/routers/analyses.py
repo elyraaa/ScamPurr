@@ -110,7 +110,7 @@ async def analyze_listing_text(
             input_url=body.url,
         )
         db.add(analysis)
-        db.commit()
+        db.flush()
 
         compute_and_save_score(db, analysis, ml_result, url_result)
         db.refresh(analysis)

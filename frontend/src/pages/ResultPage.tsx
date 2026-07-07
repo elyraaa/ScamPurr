@@ -19,10 +19,13 @@ export function ResultPage() {
 
   useEffect(() => {
     if (!id) return;
-    const guestResult = sessionStorage.getItem(`scampurr_guest_result_${id}`);
-    if (guestResult) {
+    const storedResult =
+      sessionStorage.getItem(`scampurr_result_${id}`) ||
+      sessionStorage.getItem(`scampurr_guest_result_${id}`);
+
+    if (storedResult) {
       Promise.resolve().then(() => {
-        setData(JSON.parse(guestResult));
+        setData(JSON.parse(storedResult));
         setLoading(false);
       });
       return;

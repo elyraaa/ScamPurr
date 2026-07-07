@@ -50,9 +50,7 @@ export function UrlAnalysisPage() {
     try {
       const endpoint = user ? '/analyses/url' : '/analyses/guest/url';
       const res = await api.post<FullAnalysisResponse>(endpoint, { url: data.url });
-      if (!user) {
-        sessionStorage.setItem(`scampurr_guest_result_${res.data.analysis_id}`, JSON.stringify(res.data));
-      }
+      sessionStorage.setItem(`scampurr_result_${res.data.analysis_id}`, JSON.stringify(res.data));
       navigate(`/result/${res.data.analysis_id}`);
     } catch (error) {
       setError(getErrorMessage(error, 'URL analysis failed. Please try again.'));

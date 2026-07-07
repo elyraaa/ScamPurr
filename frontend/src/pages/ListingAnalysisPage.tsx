@@ -56,9 +56,7 @@ export function ListingAnalysisPage() {
       if (data.url) payload.url = data.url;
       const endpoint = user ? '/analyses/listing' : '/analyses/guest/listing';
       const res = await api.post<FullAnalysisResponse>(endpoint, payload);
-      if (!user) {
-        sessionStorage.setItem(`scampurr_guest_result_${res.data.analysis_id}`, JSON.stringify(res.data));
-      }
+      sessionStorage.setItem(`scampurr_result_${res.data.analysis_id}`, JSON.stringify(res.data));
       navigate(`/result/${res.data.analysis_id}`);
     } catch (error) {
       setError(getErrorMessage(error, 'Analysis failed. Please try again.'));

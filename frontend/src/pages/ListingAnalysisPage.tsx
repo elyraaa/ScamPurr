@@ -12,8 +12,14 @@ import { api } from '../lib/axios';
 import { getErrorMessage } from '../lib/errors';
 import type { FullAnalysisResponse } from '../types';
 
+const MIN_LISTING_TEXT_CHARS = 20;
+const MAX_LISTING_TEXT_CHARS = 5000;
+
 const schema = z.object({
-  text: z.string().min(20, 'Listing text must be at least 20 characters'),
+  text: z
+    .string()
+    .min(MIN_LISTING_TEXT_CHARS, `Listing text must be at least ${MIN_LISTING_TEXT_CHARS} characters`)
+    .max(MAX_LISTING_TEXT_CHARS, `Listing text must be ${MAX_LISTING_TEXT_CHARS} characters or fewer`),
   url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
 });
 

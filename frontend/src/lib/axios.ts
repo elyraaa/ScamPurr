@@ -16,6 +16,30 @@ export const setAuthToken = (token: string | null) => {
   _authToken = token;
 };
 
+function formatApiErrorDetail(detail: unknown): string | null {
+  if (!detail) return null;
+  if (typeof detail === 'string') return detail;
+
+  if (Array.isArray(detail)) {
+    return detail
+      .map((item) => {
+        if (typeof item === 'string') return item;
+        if (item && typeof item === 'object' && 'msg' in item) {
+          return String((item as { msg: unknown }).msg);
+        }
+        return null;
+      })
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  if (typeof detail === 'object' && 'msg' in detail) {
+    return String((detail as { msg: unknown }).msg);
+  }
+
+  return null;
+}
+
 // Request interceptor: attach Bearer token to every request
 api.interceptors.request.use(
   (config) => {
@@ -32,7 +56,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const message =
-      error.response?.data?.detail ||
+      formatApiErrorDetail(error.response?.data?.detail) ||
       error.response?.data?.message ||
       error.message ||
       'An unexpected error occurred';

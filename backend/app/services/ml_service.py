@@ -190,6 +190,13 @@ TRUST_SIGNALS = [
 
 # ── Mock Scoring Engine ────────────────────────────────────────────────────────
 
+ADOPTION_RELEVANCE_PATTERN = re.compile(
+    r"\b(adopt|adoption|animal|cat|cats|kitten|kittens|pet|pets|rescue|shelter|"
+    r"spay|neuter|microchip|vaccination|vet|veterinary|welfare|humane|paw|paws|feline)\b",
+    re.IGNORECASE,
+)
+
+
 def _mock_score(text: str) -> MLResult:
     """Rule-based mock scorer. No model file required."""
     text_lower = text.lower()
@@ -222,6 +229,19 @@ def _mock_score(text: str) -> MLResult:
 
     # Normalize to 0–100
     # Max possible score ≈ sum of all scam weights (~7.5), we cap at 100
+    if not ADOPTION_RELEVANCE_PATTERN.search(text_lower):
+        factors.append(MLFactor(
+            factor="Low Cat Adoption Relevance",
+            weight=0.50,
+            description=(
+                "This text may be harmless, but it does not appear to describe a cat adoption, "
+                "shelter, rescue, or pet listing. Confirm you pasted the actual adoption listing."
+            ),
+            is_red_flag=True,
+            category="relevance",
+        ))
+        raw_score += 0.50
+
     MAX_RAW = sum(s["weight"] for s in SCAM_SIGNALS)
     normalized = max(0.0, min(100.0, (raw_score / MAX_RAW) * 100))
 

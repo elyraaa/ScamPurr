@@ -77,6 +77,12 @@ TRUSTED_INDICATORS = [
     "humanesociety", "rspca", "cats.org", "catrescue",
 ]
 
+ADOPTION_RELEVANCE_KEYWORDS = [
+    "adopt", "adoption", "animal", "cat", "cats", "kitten", "kittens",
+    "pet", "pets", "rescue", "shelter", "spay", "neuter", "veterinary",
+    "vet", "welfare", "humane", "paw", "paws", "feline",
+]
+
 
 def _mock_url_score(url: str) -> URLResult:
     """Pattern-based mock URL scorer."""
@@ -85,6 +91,7 @@ def _mock_url_score(url: str) -> URLResult:
     tld = "." + hostname.split(".")[-1] if "." in hostname else ""
     scheme = parsed.scheme.lower()
     url_lower = url.lower()
+    relevance_text = f"{hostname} {parsed.path}".lower()
 
     factors: list[URLFactor] = []
     raw_score = 0.0
@@ -159,6 +166,20 @@ def _mock_url_score(url: str) -> URLResult:
             ))
             raw_score -= 0.90
             break
+
+    if not any(keyword in relevance_text for keyword in ADOPTION_RELEVANCE_KEYWORDS):
+        factors.append(URLFactor(
+            factor="Low Cat Adoption Relevance",
+            weight=0.50,
+            description=(
+                "This site may be technically safe, but the URL does not appear related to "
+                "cat adoption, animal rescue, shelters, or pet welfare. Confirm the link is "
+                "actually connected to the listing."
+            ),
+            is_red_flag=True,
+            category="relevance",
+        ))
+        raw_score += 0.50
 
     # ── Very new domain pattern (mock: random-looking domains) ────────────
     # Heuristic: domains with lots of numbers or very long substrings are suspicious
@@ -390,7 +411,7 @@ async def _real_url_score(url: str) -> URLResult:
     # Pattern-based additions (from mock scorer)
     mock_result = _mock_url_score(url)
     for f in mock_result.factors:
-        if f.category in ("domain",) and f.is_red_flag:
+        if f.category in ("domain", "relevance") and f.is_red_flag:
             if not any(ef.factor == f.factor for ef in factors):
                 factors.append(f)
                 raw_score += f.weight * 0.5
